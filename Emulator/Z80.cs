@@ -69,5 +69,6 @@ namespace Ceres80Emu.Emulator
         private MemoryBus _memoryBus;
         private InterruptManager _interruptManager;
         private RegisterSet _registers;
+        private bool _halted = false;
     }
 }
