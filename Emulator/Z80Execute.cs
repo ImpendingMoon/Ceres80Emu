@@ -6,15 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ceres80Emu.Emulator
 {
-    internal partial class Z80
+    // Handles execution of Z80 instructions
+    internal class Z80Execute
     {
-        /// <summary>
-        /// Executes a single instruction
-        /// </summary>
-        /// <returns>Number of cycles taken</returns>
-        public int Step()
-        {
-            return 0;
-        }
     }
 }

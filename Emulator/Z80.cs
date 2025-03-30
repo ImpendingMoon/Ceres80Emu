@@ -8,7 +8,9 @@ namespace Ceres80Emu.Emulator
 {
     /// <summary>
     /// Emulates a Z80 CPU.
-    /// Z80.cs handles most methods and properties, while Z80Execute.cs Z80 handles execution.
+    /// Z80.cs handles public-facing methods and members.
+    /// Z80Decode.cs handles decoding of instructions.
+    /// Z80Execute.cs handles execution of instructions.
     /// This is because decoding takes several thousand lines of code.
     /// </summary>
     internal partial class Z80
