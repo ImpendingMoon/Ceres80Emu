@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Pkcs;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ceres80Emu.Emulator
 {
@@ -677,6 +672,65 @@ namespace Ceres80Emu.Emulator
             ushort address = (ushort)(index + offset);
             dest = Xor8(dest, _memoryBus.Read(address));
             return 15;
+        }
+
+        /// <summary>
+        /// BCD corrects the value in A
+        /// <br/>Example: DAA
+        /// Implementation taken from "The Undocumented Z80 Documented" by Sean Young
+        /// </summary>
+        private int Decimal_Adjust_A()
+        {
+            int t = 0;
+
+            if (_registers.HalfCarry || ((_registers.A & 0xF) > 9))
+            {
+                t++;
+            }
+                
+            if (_registers.Carry || (_registers.A > 0x99))
+            {
+                t += 2;
+                _registers.Carry = true;
+            }
+
+            
+            if (_registers.Subtract && !_registers.HalfCarry)
+            {
+                _registers.HalfCarry = false;
+            }
+            else
+            {
+                if (_registers.Subtract && _registers.HalfCarry)
+                    _registers.HalfCarry = (((_registers.A & 0x0F)) < 6);
+                else
+                    _registers.HalfCarry = ((_registers.A & 0x0F) >= 0x0A);
+            }
+
+            switch (t)
+            {
+                case 1:
+                {
+                    _registers.A += (byte)((_registers.Subtract) ? 0xFA : 0x06); // -6:6
+                    break;
+                }
+                case 2:
+                {
+                    _registers.A += (byte)((_registers.Subtract) ? 0xA0 : 0x60); // -0x60:0x60
+                    break;
+                }
+                case 3:
+                {
+                    _registers.A += (byte)((_registers.Subtract) ? 0x9A : 0x66); // -0x66:0x66
+                    break;
+                }
+            }
+
+            _registers.Sign = (_registers.A & 0x80) != 0;
+            _registers.Zero = _registers.A == 0;
+            _registers.ParityOverflow = Parity(_registers.A);
+
+            return 4;
         }
 
 
