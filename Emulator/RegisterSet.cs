@@ -56,6 +56,60 @@ namespace Ceres80Emu.Emulator
             get => ByteToShort(AltH, AltL);
             set => (AltH, AltL) = ShortToByte(value);
         }
+        public bool Sign
+        {
+            get => (F & 0b10000000) != 0;
+            set {
+                F &= 0b01111111;
+                F |= (byte)(value ? 0b10000000 : 0);
+            }
+        }
+        public bool Zero
+        {
+            get => (F & 0b01000000) != 0;
+            set
+            {
+                F &= 0b10111111;
+                F |= (byte)(value ? 0b01000000 : 0);
+            }
+        }
+        public bool HalfCarry
+        {
+            get => (F & 0b00010000) != 0;
+            set
+            {
+                F &= 0b11101111;
+                F |= (byte)(value ? 0b00010000 : 0);
+            }
+        }
+        public bool ParityOverflow
+        {
+            get => (F & 0b00000100) != 0;
+            set
+            {
+                F &= 0b11111011;
+                F |= (byte)(value ? 0b00000100 : 0);
+            }
+        }
+        public bool Subtract
+        {
+            get => (F & 0b00000010) != 0;
+            set
+            {
+                F &= 0b11111101;
+                F |= (byte)(value ? 0b00000010 : 0);
+            }
+        }
+        public bool Carry
+        {
+            get => (F & 0b00000001) != 0;
+            set
+            {
+                F &= 0b11111110;
+                F |= (byte)(value ? 0b00000001 : 0);
+            }
+        }
+
 
         private static ushort ByteToShort(byte high, byte low)
         {
