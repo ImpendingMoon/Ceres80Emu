@@ -1170,7 +1170,30 @@ namespace Ceres80Emu.Emulator
             return 4;
         }
 
-        // Internal helper methods
+        private int Enable_Interrupts()
+        {
+            _registers.IFF1 = _registers.IFF2 = true;
+            _justEnabledInterrupts = true;
+            return 4;
+        }
+
+        private int Disable_Interrupts()
+        {
+            _registers.IFF1 = _registers.IFF2 = false;
+            return 4;
+        }
+
+        private int Set_Interrupt_Mode(byte mode)
+        {
+            // Ceres80 only uses IM 1, because my physical Z80's IM 2 is broken.
+            if (mode != 1)
+            {
+                Console.WriteLine("WARNING! This emulator only supports IM 1!");
+            }
+            return 4;
+        }
+
+        /************************** Internal Helpers *************************/
         private ushort ReadShort(ushort address)
         {
             byte low = _memoryBus.Read(address);

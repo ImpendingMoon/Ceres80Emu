@@ -69,6 +69,6 @@ namespace Ceres80Emu.Emulator
         private RegisterSet _registers;
         private bool _halted = false;
         // EI instruction is delayed by one instruction for returning from an isr
-        private bool _justEnabledInterrupt = false;
+        private bool _justEnabledInterrupts = false;
     }
 }
