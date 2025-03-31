@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Pkcs;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace Ceres80Emu.Emulator
 {
     // Handles execution of Z80 instructions
     // All methods return the number of cycles taken
-    internal partial class  Z80
+    internal partial class Z80
     {
         /************************* Load and Exchange *************************/
 
@@ -349,7 +350,7 @@ namespace Ceres80Emu.Emulator
             _registers.HalfCarry = (dest & 0x0FFF) < (src & 0x0FFF);
 
             // ADC rr, rr' has different behavior than ADD rr, rr'
-            if(carry)
+            if (carry)
             {
                 _registers.ParityOverflow = overflow;
                 _registers.Zero = dest == 0;
@@ -899,6 +900,135 @@ namespace Ceres80Emu.Emulator
 
         /********************** Jump, Call, and Return ***********************/
 
+        /// <summary>
+        /// Jumps to an address
+        /// <br/>Example: JP 1234h
+        /// </summary>
+        private int Jump(bool condition = true)
+        {
+            ushort address = ReadImm16();
+            if (condition)
+            {
+                _registers.PC = address;
+            }
+            return 10;
+        }
+
+        /// <summary>
+        /// Jumps to the address in HL
+        /// <br/>Example: JP (HL)
+        /// </summary>
+        private int Jump_HL()
+        {
+            _registers.PC = _registers.HL;
+            return 4;
+        }
+
+        /// <summary>
+        /// Adds a signed offset to the address
+        /// <br/>Example: JR 10
+        /// </summary>
+        private int Jump_Relative(bool condition = true)
+        {
+            sbyte offset = (sbyte)ReadImm();
+            if (condition)
+            {
+                _registers.PC = (ushort)(_registers.PC + offset);
+                return 12;
+            }
+            return 7;
+        }
+
+        /// <summary>
+        /// Decrements B, then adds a signed offset to the address if B is not zero
+        /// <br/>Example: DJNZ -10
+        /// </summary>
+        private int Dec_Jump_Not_Zero()
+        {
+            sbyte offset = (sbyte)ReadImm();
+            _registers.B--;
+            if (_registers.B != 0)
+            {
+                _registers.PC = (ushort)(_registers.PC + offset);
+                return 13;
+            }
+            return 10;
+        }
+
+        /// <summary>
+        /// Pushes the address of the next instruction onto the stack, then jumps to an address
+        /// <br/>Example: CALL 1234h
+        /// </summary>
+        private int Call(bool condition = true)
+        {
+            ushort address = ReadImm16();
+            if (condition)
+            {
+                _registers.SP -= 2;
+                WriteShort(_registers.SP, _registers.PC);
+                _registers.PC = address;
+                return 17;
+            }
+            return 10;
+        }
+
+        /// <summary>
+        /// Pushes the address of the next instruction onto the stack, then jumps to a reset vector
+        /// <br/>Example: RST 00h
+        /// </summary>
+        private int Reset(byte address)
+        {
+            _registers.SP -= 2;
+            WriteShort(_registers.SP, _registers.PC);
+            _registers.PC = address;
+            return 11;
+        }
+
+        /// <summary>
+        /// Pops an address from the stack and jumps to it
+        /// <br/>Example: RET
+        /// </summary>
+        private int Return(bool? condition = null)
+        {
+            // RET without a condition is faster than RET cc
+            if (condition == null)
+            {
+                _registers.PC = ReadShort(_registers.SP);
+                _registers.SP += 2;
+                return 10;
+            }
+
+            if (condition == true)
+            {
+                _registers.PC = ReadShort(_registers.SP);
+                _registers.SP += 2;
+                return 11;
+            }
+            return 5;
+        }
+
+        /// <summary>
+        /// Pops an address from the stack and jumps to it, theoretically sending an interrupt acknowledge signal
+        /// <br/>Example: RETI
+        /// </summary>
+        private int Return_From_Interrupt()
+        {
+            _registers.PC = ReadShort(_registers.SP);
+            _registers.SP += 2;
+            return 10;
+        }
+
+        /// <summary>
+        /// Pops an address from the stack and jumps to it, restoring the IFF1 flag
+        /// <br/>Example: RETN
+        /// </summary>
+        private int Return_From_Nonmaskable_Interrupt()
+        {
+            _registers.PC = ReadShort(_registers.SP);
+            _registers.SP += 2;
+            _registers.IFF1 = _registers.IFF2;
+            return 10;
+        }
 
 
         /*************************** Input/Output ****************************/
@@ -1026,16 +1156,6 @@ namespace Ceres80Emu.Emulator
             ushort value = ReadShort((ushort)(_registers.PC + 1));
             _registers.PC += 2;
             return value;
-        }
-
-        private bool WillOverflow<T>(T a, T b) where T : IComparable<T>
-        {
-            return a.CompareTo(default(T)) > 0 && b.CompareTo(default(T)) > 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) < 0;
-        }
-
-        private bool WillUnderflow<T>(T a, T b) where T : IComparable<T>
-        {
-            return a.CompareTo(default(T)) < 0 && b.CompareTo(default(T)) < 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) > 0;
         }
 
         private byte Add8(byte a, byte b, bool carry, bool setCarry = true)
@@ -1236,4 +1356,15 @@ namespace Ceres80Emu.Emulator
             }
             return count % 2 == 0;
         }
+
+        private bool WillOverflow<T>(T a, T b) where T : IComparable<T>
+        {
+            return a.CompareTo(default(T)) > 0 && b.CompareTo(default(T)) > 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) < 0;
+        }
+
+        private bool WillUnderflow<T>(T a, T b) where T : IComparable<T>
+        {
+            return a.CompareTo(default(T)) < 0 && b.CompareTo(default(T)) < 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) > 0;
+        }
+    }
 }

@@ -15,7 +15,12 @@ namespace Ceres80Emu.Emulator
         public ushort IX, IY, SP, PC;
         // Interrupt vector and refresh
         public byte I, R;
+        // Interrupt flip-flops
+        public bool IFF1, IFF2;
 
+
+
+        // Register pairs
         public ushort AF
         {
             get => ByteToShort(A, F);
@@ -56,6 +61,10 @@ namespace Ceres80Emu.Emulator
             get => ByteToShort(AltH, AltL);
             set => (AltH, AltL) = ShortToByte(value);
         }
+
+
+
+        // Flags
         public bool Sign
         {
             get => (F & 0b10000000) != 0;
@@ -111,6 +120,8 @@ namespace Ceres80Emu.Emulator
         }
 
 
+
+        // Helper functions
         private static ushort ByteToShort(byte high, byte low)
         {
             return (ushort)((high << 8) | low);
