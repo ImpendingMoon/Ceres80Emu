@@ -55,13 +55,11 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         public void Reset()
         {
-            // PC starts at 0x0000, others technically undefined, use 0 for simplicity
+            // Every register starts at 0 (corrected by Z80 Undocumented Features by Sean Young)
             foreach (var field in _registers.GetType().GetFields())
             {
                 field.SetValue(_registers, 0);
             }
-            // Stack pointer starts at top of RAM
-            _registers.SP = 0xFFFF;
         }
 
 
