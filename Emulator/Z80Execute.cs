@@ -1352,14 +1352,14 @@ namespace Ceres80Emu.Emulator
 
         private byte ReadImm()
         {
-            byte value = _memoryBus.Read((ushort)(_registers.PC + 1));
+            byte value = _memoryBus.Read((ushort)(_registers.PC));
             _registers.PC += 1;
             return value;
         }
 
         private ushort ReadImm16()
         {
-            ushort value = ReadShort((ushort)(_registers.PC + 1));
+            ushort value = ReadShort((ushort)(_registers.PC));
             _registers.PC += 2;
             return value;
         }

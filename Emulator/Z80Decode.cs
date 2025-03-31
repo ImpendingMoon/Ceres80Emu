@@ -10,36 +10,48 @@ namespace Ceres80Emu.Emulator
         /// <returns>Number of cycles taken</returns>
         public int Step()
         {
+            // Only implement Interrupt Mode 1.
+            if (_interruptManager.IsInterruptPending() && _registers.IFF1 && !_justEnabledInterrupts)
+            {
+                _halted = false;
+                Push_Reg16(_registers.PC);
+                _registers.PC = 0x0038;
+                _interruptManager.AcknowledgeInterrupt();
+                Console.WriteLine("Z80: Received interrupt");
+                return 13;
+            }
+
+            if(_halted)
+            {
+                return 4;
+            }
+
             int cycles = 0;
             string instruction = "";
-            byte opcode = _memoryBus.Read(_registers.PC);
 
-            // TODO: Check interrupt status
+            ushort address = _registers.PC;
+            byte opcode = ReadImm();
 
             switch (opcode)
             {
                 // Handle opcode prefixes
                 case 0xCB:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeBit();
                     break;
                 }
                 case 0xDD:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeIX();
                     break;
                 }
                 case 0xED:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeMisc();
                     break;
                 }
                 case 0xFD:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeIY();
                     break;
                 }
@@ -50,7 +62,23 @@ namespace Ceres80Emu.Emulator
                 }
             }
 
-            Console.WriteLine($"Executed instruction: {instruction} with opcode {opcode:X02} at {_registers.PC:X04}");
+            // Handle EI instruction delay
+            if (_justEnabledInterrupts)
+            {
+                _justEnabledInterrupts = false;
+            }
+
+            // Memory Refresh Register (7-bit)
+            _registers.R++;
+            if (_registers.R == 128)
+            {
+                _registers.R = 0;
+            }
+
+            // Repeaat instructions (LDIR, LDDR, etc.) stay on the same instruction until BC is 0
+            if (_runningRepeatInstruction) { _registers.PC = address; }
+
+            Console.WriteLine($"Z80: Executed instruction: {instruction} at {address:X04}");
             return cycles;
         }
 
@@ -60,7 +88,7 @@ namespace Ceres80Emu.Emulator
         {
             int cycles = 0;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = ReadImm();
 
             switch (opcode)
             {
@@ -1353,11 +1381,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "LDIR";
                     if (_registers.BC != 0)
                     {
-                        // HACK: Negate PC increment to stay on the same instruction
-                        _registers.PC--;
-                        // Takes 5 cycles to jump
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xB1:
@@ -1366,9 +1393,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "CPIR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xB2:
@@ -1377,9 +1405,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "INIR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xB3:
@@ -1388,9 +1417,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "OTIR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xB8:
@@ -1399,9 +1429,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "LDDR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xB9:
@@ -1410,9 +1441,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "CPDR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xBA:
@@ -1421,9 +1453,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "INDR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 case 0xBB:
@@ -1432,9 +1465,10 @@ namespace Ceres80Emu.Emulator
                     instruction = "OTDR";
                     if (_registers.BC != 0)
                     {
-                        _registers.PC--;
+                        _runningRepeatInstruction = true;
                         cycles += 5;
                     }
+                    _runningRepeatInstruction = false;
                     break;
                 }
                 default:
