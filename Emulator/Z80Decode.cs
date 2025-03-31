@@ -1647,6 +1647,400 @@ namespace Ceres80Emu.Emulator
 
             switch (opcode)
             {
+                case 0x40:
+                {
+                    cycles += In_C_Reg(ref _registers.B);
+                    instruction = "IN B, (C)";
+                    break;
+                }
+                case 0x41:
+                {
+                    cycles += Out_C_Reg(_registers.C);
+                    instruction = "OUT (C), B";
+                    break;
+                }
+                case 0x42:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Sub_Reg16_Reg16(ref temp, _registers.BC);
+                    _registers.HL = temp;
+                    instruction = "SBC HL, BC";
+                    break;
+                }
+                case 0x43:
+                {
+                    cycles += Load_ImmPtr_Reg16(_registers.BC);
+                    instruction = "LD (nn), BC";
+                    break;
+                }
+                case 0x44:
+                {
+                    cycles += Negate_A();
+                    instruction = "NEG";
+                    break;
+                }
+                case 0x45:
+                {
+                    cycles += Return_From_Nonmaskable_Interrupt();
+                    instruction = "RETN";
+                    break;
+                }
+                case 0x46:
+                {
+                    cycles += Set_Interrupt_Mode(0);
+                    instruction = "IM 0";
+                    break;
+                }
+                case 0x47:
+                {
+                    cycles += Load_Reg_Reg(_registers.I, _registers.A);
+                    instruction = "LD I, A";
+                    break;
+                }
+                case 0x48:
+                {
+                    cycles += In_C_Reg(ref _registers.C);
+                    instruction = "IN C, (C)";
+                    break;
+                }
+                case 0x49:
+                {
+                    cycles += Out_C_Reg(_registers.C);
+                    instruction = "OUT (C), C";
+                    break;
+                }
+                case 0x4A:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.BC, true);
+                    _registers.HL = temp;
+                    instruction = "ADC HL, BC";
+                    break;
+                }
+                case 0x4B:
+                {
+                    cycles += Load_Reg16Ptr_Imm(_registers.BC);
+                    instruction = "LD BC, (nn)";
+                    break;
+                }
+                case 0x4D:
+                {
+                    cycles += Return_From_Interrupt();
+                    instruction = "RETI";
+                    break;
+                }
+                case 0x4F:
+                {
+                    cycles += Load_Reg_Reg(ref _registers.R, _registers.A);
+                    instruction = "LD R, A";
+                    break;
+                }
+                case 0x50:
+                {
+                    cycles += In_C_Reg(ref _registers.D);
+                    instruction = "IN D, (C)";
+                    break;
+                }
+                case 0x51:
+                {
+                    cycles += Out_C_Reg(_registers.D);
+                    instruction = "OUT (C), D";
+                    break;
+                }
+                case 0x52:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Sub_Reg16_Reg16(ref temp, _registers.DE);
+                    _registers.HL = temp;
+                    instruction = "SBC HL, DE";
+                    break;
+                }
+                case 0x53:
+                {
+                    cycles += Load_ImmPtr_Reg16(_registers.DE);
+                    instruction = "LD (nn), DE";
+                    break;
+                }
+                case 0x56:
+                {
+                    cycles += Set_Interrupt_Mode(1);
+                    instruction = "IM 1";
+                    break;
+                }
+                case 0x57:
+                {
+                    cycles += Load_Reg_Reg(ref _registers.A, _registers.I);
+                    instruction = "LD A, I";
+                    break;
+                }
+                case 0x58:
+                {
+                    cycles += In_C_Reg(ref _registers.E);
+                    instruction = "IN E, (C)";
+                    break;
+                }
+                case 0x59:
+                {
+                    cycles += Out_C_Reg(_registers.E);
+                    instruction = "OUT (C), E";
+                    break;
+                }
+                case 0x5A:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.DE, true);
+                    _registers.HL = temp;
+                    instruction = "ADC HL, DE";
+                    break;
+                }
+                case 0x5B:
+                {
+                    cycles += Load_Reg16Ptr_Imm(_registers.DE);
+                    instruction = "LD DE, (nn)";
+                    break;
+                }
+                case 0x5E:
+                {
+                    cycles += Set_Interrupt_Mode(2);
+                    instruction = "IM 2";
+                    break;
+                }
+                case 0x5F:
+                {
+                    cycles += Load_Reg_Reg(ref _registers.A, _registers.R);
+                    instruction = "LD A, R";
+                    break;
+                }
+                case 0x60:
+                {
+                    cycles += In_C_Reg(ref _registers.H);
+                    instruction = "IN H, (C)";
+                    break;
+                }
+                case 0x61:
+                {
+                    cycles += Out_C_Reg(_registers.H);
+                    instruction = "OUT (C), H";
+                    break;
+                }
+                case 0x62:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Sub_Reg16_Reg16(ref temp, _registers.HL);
+                    _registers.HL = temp;
+                    instruction = "SBC HL, HL";
+                    break;
+                }
+                case 0x67:
+                {
+                    cycles += RRD();
+                    instruction = "RRD";
+                    break;
+                }
+                case 0x68:
+                {
+                    cycles += In_C_Reg(ref _registers.L);
+                    instruction = "IN L, (C)";
+                    break;
+                }
+                case 0x69:
+                {
+                    cycles += Out_C_Reg(_registers.L);
+                    instruction = "OUT (C), L";
+                    break;
+                }
+                case 0x6A:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.HL, true);
+                    _registers.HL = temp;
+                    instruction = "ADC HL, HL";
+                    break;
+                }
+                case 0x6F:
+                {
+                    cycles += RLD();
+                    instruction = "RLD";
+                    break;
+                }
+                case 0x72:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Sub_Reg16_Reg16(ref temp, _registers.SP);
+                    _registers.HL = temp;
+                    instruction = "SBC HL, SP";
+                    break;
+                }
+                case 0x73:
+                {
+                    cycles += Load_ImmPtr_Reg16(_registers.SP);
+                    instruction = "LD (nn), SP";
+                    break;
+                }
+                case 0x78:
+                {
+                    cycles += In_C_Reg(ref _registers.A);
+                    instruction = "IN A, (C)";
+                    break;
+                }
+                case 0x79:
+                {
+                    cycles += Out_C_Reg(_registers.A);
+                    instruction = "OUT (C), A";
+                    break;
+                }
+                case 0x7A:
+                {
+                    ushort temp = _registers.HL;
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.SP, true);
+                    _registers.HL = temp;
+                    instruction = "ADC HL, SP";
+                    break;
+                }
+                case 0x7B:
+                {
+                    cycles += Load_Reg16Ptr_Imm(_registers.SP);
+                    instruction = "LD SP, (nn)";
+                    break;
+                }
+                case 0xA0:
+                {
+                    cycles += Load_Increment();
+                    instruction = "LDI";
+                    break;
+                }
+                case 0xA1:
+                {
+                    cycles += Compare_Increment();
+                    instruction = "CPI";
+                    break;
+                }
+                case 0xA2:
+                {
+                    cycles += In_Increment();
+                    instruction = "INI";
+                    break;
+                }
+                case 0xA3:
+                {
+                    cycles += Out_Increment();
+                    instruction = "OUTI";
+                    break;
+                }
+                case 0xA8:
+                {
+                    cycles += Load_Decrement();
+                    instruction = "LDD";
+                    break;
+                }
+                case 0xA9:
+                {
+                    cycles += Compare_Decrement();
+                    instruction = "CPD";
+                    break;
+                }
+                case 0xAA:
+                {
+                    cycles += In_Decrement();
+                    instruction = "IND";
+                    break;
+                }
+                case 0xAB:
+                {
+                    cycles += Out_Decrement();
+                    instruction = "OUTD";
+                    break;
+                }
+                case 0xB0:
+                {
+                    cycles += Load_Increment();
+                    instruction = "LDIR";
+                    if(_registers.BC != 0)
+                    {
+                        // HACK: Negate PC increment to stay on the same instruction
+                        _registers.PC--;
+                        // Takes 5 cycles to jump
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xB1:
+                {
+                    cycles += Compare_Increment();
+                    instruction = "CPIR";
+                    if(_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xB2:
+                {
+                    cycles += In_Increment();
+                    instruction = "INIR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xB3:
+                {
+                    cycles += Out_Increment();
+                    instruction = "OTIR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xB8:
+                {
+                    cycles += Load_Decrement();
+                    instruction = "LDDR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xB9:
+                {
+                    cycles += Compare_Decrement();
+                    instruction = "CPDR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xBA:
+                {
+                    cycles += In_Decrement();
+                    instruction = "INDR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
+                case 0xBB:
+                {
+                    cycles += Out_Decrement();
+                    instruction = "OTDR";
+                    if (_registers.BC != 0)
+                    {
+                        _registers.PC--;
+                        cycles += 5;
+                    }
+                    break;
+                }
                 default:
                 {
                     cycles = 0;
