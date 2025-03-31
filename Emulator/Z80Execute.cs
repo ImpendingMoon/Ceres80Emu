@@ -209,6 +209,84 @@ namespace Ceres80Emu.Emulator
 
         // Block Transfer and Search
 
+        /// <summary>
+        /// Loads a value in memory from (HL) to (DE), incrementing both HL and DE and decrementing BC
+        /// <br/>Example: LDI, LDIR
+        /// </summary>
+        private int Load_Increment()
+        {
+            ushort value = ReadShort(_registers.HL);
+            WriteShort(_registers.DE, value);
+            _registers.HL++;
+            _registers.DE++;
+            _registers.BC--;
+
+            _registers.Subtract = false;
+            _registers.HalfCarry = false;
+            _registers.ParityOverflow = _registers.BC != 0;
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Loads a value in memory from (HL) to (DE), decrementing HL, DE, and BC
+        /// <br/>Example: LDD, LDDR
+        /// </summary>
+        private int Load_Decrement()
+        {
+            ushort value = ReadShort(_registers.HL);
+            WriteShort(_registers.DE, value);
+            _registers.HL--;
+            _registers.DE--;
+            _registers.BC--;
+
+            _registers.Subtract = false;
+            _registers.HalfCarry = false;
+            _registers.ParityOverflow = _registers.BC != 0;
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Compares the value at (HL) with A, incrementing HL and decrementing BC
+        /// <br/>Example: CPI, CPIR
+        /// </summary>
+        private int Compare_Increment()
+        {
+            byte value = _memoryBus.Read(_registers.HL);
+            byte result = (byte)(_registers.A - value);
+            _registers.HL++;
+            _registers.BC--;
+
+            _registers.Subtract = true;
+            _registers.ParityOverflow = _registers.BC != 0;
+            _registers.HalfCarry = (result & 0x0F) > (_registers.A & 0x0F);
+            _registers.Zero = result == 0;
+            _registers.Sign = (result & 0x80) != 0;
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Compares the value at (HL) with A, decrementing HL and BC
+        /// <br/>Example: CPD, CPDR
+        /// </summary>
+        private int Compare_Decrement()
+        {
+            byte value = _memoryBus.Read(_registers.HL);
+            byte result = (byte)(_registers.A - value);
+            _registers.HL--;
+            _registers.BC--;
+
+            _registers.Subtract = true;
+            _registers.ParityOverflow = _registers.BC != 0;
+            _registers.HalfCarry = (result & 0x0F) > (_registers.A & 0x0F);
+            _registers.Zero = result == 0;
+            _registers.Sign = (result & 0x80) != 0;
+
+            return 16;
+        }
+
         // Arithmetic and Logical
 
         // Rotate and Shift
@@ -218,6 +296,78 @@ namespace Ceres80Emu.Emulator
         // Jump, Call, and Return
 
         // Input/Output
+
+        /// <summary>
+        /// Loads a value from Port (BC) to (HL), incrementing HL and decrementing B
+        /// <br/>Example: INI, INIR
+        /// <br/>Note: This has some undocumented behavior that needs to be researched
+        /// </summary>
+        private int In_Increment()
+        {
+            byte value = _memoryBus.Read(_registers.BC, true);
+            _memoryBus.Write(_registers.HL, value);
+            _registers.HL++;
+            _registers.B--;
+
+            _registers.Subtract = true;
+            _registers.Zero = _registers.BC == 0; // ??? (Need to find documentation)
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Loads a value from Port (BC) to (HL), decrementing HL and B
+        /// <br/>Example: IND, INDR
+        /// <br/>Note: This has some undocumented behavior that needs to be researched
+        /// </summary>
+        private int In_Decrement()
+        {
+            byte value = _memoryBus.Read(_registers.BC, true);
+            _memoryBus.Write(_registers.HL, value);
+            _registers.HL--;
+            _registers.B--;
+
+            _registers.Subtract = true;
+            _registers.Zero = _registers.BC == 0; // ??? (Need to find documentation)
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Loads a value from (HL) to Port (BC), incrementing HL and decrementing B
+        /// <br/>Example: OUTI, OTIR
+        /// <br/>Note: This has some undocumented behavior that needs to be researched
+        /// </summary>
+        private int Out_Increment()
+        {
+            _registers.B--;
+            byte value = _memoryBus.Read(_registers.HL);
+            _memoryBus.Write(_registers.BC, value, true);
+            _registers.HL++;
+
+            _registers.Subtract = true;
+            _registers.Zero = _registers.BC == 0; // ??? (Need to find documentation)
+
+            return 16;
+        }
+
+        /// <summary>
+        /// Loads a value from (HL) to Port (BC), decrementing HL and B
+        /// <br/>Example: OUTD, OTDR
+        /// <br/>Note: This has some undocumented behavior that needs to be researched
+        /// </summary>
+        private int Out_Decrement()
+        {
+            _registers.B--;
+            byte value = _memoryBus.Read(_registers.HL);
+            _memoryBus.Write(_registers.BC, value, true);
+            _registers.HL--;
+
+            _registers.Subtract = true;
+            _registers.Zero = _registers.BC == 0; // ??? (Need to find documentation)
+
+            return 16;
+        }
 
         // CPU Control
 
@@ -268,6 +418,16 @@ namespace Ceres80Emu.Emulator
             ushort value = ReadShort((ushort)(_registers.PC + 1));
             _registers.PC += 2;
             return value;
+        }
+
+        private bool WillOverflow<T>(T a, T b) where T : IComparable<T>
+        {
+            return a.CompareTo(default(T)) > 0 && b.CompareTo(default(T)) > 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) < 0;
+        }
+
+        private bool WillUnderflow<T>(T a, T b) where T : IComparable<T>
+        {
+            return a.CompareTo(default(T)) < 0 && b.CompareTo(default(T)) < 0 && a.CompareTo(default(T)) + b.CompareTo(default(T)) > 0;
         }
     }
 }
