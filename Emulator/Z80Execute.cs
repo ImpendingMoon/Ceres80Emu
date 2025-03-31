@@ -1034,13 +1034,55 @@ namespace Ceres80Emu.Emulator
         /*************************** Input/Output ****************************/
 
         /// <summary>
-        /// Loads a value from Port (BC) to (HL), incrementing HL and decrementing B
+        /// Loads a value from a port to a register
+        /// <br/>Example: IN A, (00h)
+        /// </summary>
+        private int In_Reg(ref byte reg)
+        {
+            byte port = ReadImm();
+            reg = _memoryBus.Read((ushort)(port), true);
+            return 11;
+        }
+
+        /// <summary>
+        /// Loads a value from a register to a port
+        /// <br/>Example: OUT (00h), A
+        /// </summary>
+        private int Out_Reg(byte reg)
+        {
+            byte port = ReadImm();
+            _memoryBus.Write((ushort)(port), reg, true);
+            return 11;
+        }
+
+        /// <summary>
+        /// Loads a value from Port (C) to a register
+        /// <br/>Example: IN A, (C)
+        /// </summary>
+        private int In_C_Reg(ref byte reg)
+        {
+            reg = _memoryBus.Read(_registers.C, true);
+            return 8;
+        }
+
+        /// <summary>
+        /// Loads a value from a register to Port (C)
+        /// <br/>Example: OUT (C), A
+        /// </summary>
+        private int Out_C_Reg(byte reg)
+        {
+            _memoryBus.Write(_registers.C, reg, true);
+            return 8;
+        }
+
+        /// <summary>
+        /// Loads a value from Port (C) to (HL), incrementing HL and decrementing B
         /// <br/>Example: INI, INIR
         /// <br/>Note: This has some undocumented behavior that needs to be researched
         /// </summary>
         private int In_Increment()
         {
-            byte value = _memoryBus.Read(_registers.BC, true);
+            byte value = _memoryBus.Read(_registers.C, true);
             _memoryBus.Write(_registers.HL, value);
             _registers.HL++;
             _registers.B--;
@@ -1052,13 +1094,13 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
-        /// Loads a value from Port (BC) to (HL), decrementing HL and B
+        /// Loads a value from Port (C) to (HL), decrementing HL and B
         /// <br/>Example: IND, INDR
         /// <br/>Note: This has some undocumented behavior that needs to be researched
         /// </summary>
         private int In_Decrement()
         {
-            byte value = _memoryBus.Read(_registers.BC, true);
+            byte value = _memoryBus.Read(_registers.C, true);
             _memoryBus.Write(_registers.HL, value);
             _registers.HL--;
             _registers.B--;
@@ -1070,7 +1112,7 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
-        /// Loads a value from (HL) to Port (BC), incrementing HL and decrementing B
+        /// Loads a value from (HL) to Port (C), incrementing HL and decrementing B
         /// <br/>Example: OUTI, OTIR
         /// <br/>Note: This has some undocumented behavior that needs to be researched
         /// </summary>
@@ -1078,7 +1120,7 @@ namespace Ceres80Emu.Emulator
         {
             _registers.B--;
             byte value = _memoryBus.Read(_registers.HL);
-            _memoryBus.Write(_registers.BC, value, true);
+            _memoryBus.Write(_registers.C, value, true);
             _registers.HL++;
 
             _registers.Subtract = true;
@@ -1088,7 +1130,7 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
-        /// Loads a value from (HL) to Port (BC), decrementing HL and B
+        /// Loads a value from (HL) to Port (C), decrementing HL and B
         /// <br/>Example: OUTD, OTDR
         /// <br/>Note: This has some undocumented behavior that needs to be researched
         /// </summary>
@@ -1096,7 +1138,7 @@ namespace Ceres80Emu.Emulator
         {
             _registers.B--;
             byte value = _memoryBus.Read(_registers.HL);
-            _memoryBus.Write(_registers.BC, value, true);
+            _memoryBus.Write(_registers.C, value, true);
             _registers.HL--;
 
             _registers.Subtract = true;
