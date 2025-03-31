@@ -444,6 +444,7 @@ namespace Ceres80Emu.Emulator
 
         /// <summary>
         /// Subtracts a register pair from another register pair
+        /// Subtracts a register pair from another register pair
         /// <br/>Example: SUB HL, BC
         /// </summary>
         private int Sub_Reg16_Reg16(ref ushort dest, ushort src)
@@ -978,7 +979,7 @@ namespace Ceres80Emu.Emulator
         /// Tests a bit in a register
         /// <br/>Example: BIT 0, B
         /// </summary>
-        private int Bit_Reg(byte bit, byte reg)
+        private int Bit_Reg(byte bit, ref byte reg)
         {
             Bit8(bit, reg);
             return 4;
@@ -999,7 +1000,7 @@ namespace Ceres80Emu.Emulator
         /// Sets a bit in a register
         /// <br/>Example: SET 0, B
         /// </summary>
-        private int Set_Reg(ref byte bit, byte reg)
+        private int Set_Reg(byte bit, ref byte reg)
         {
             reg = Set8(bit, reg);
             return 4;
@@ -1020,7 +1021,7 @@ namespace Ceres80Emu.Emulator
         /// Resets a bit in a register
         /// <br/>Example: RES 0, B
         /// </summary>
-        private int Reset_Reg(ref byte bit, byte reg)
+        private int Reset_Reg(byte bit, ref byte reg)
         {
             reg = Reset8(bit, reg);
             return 4;
