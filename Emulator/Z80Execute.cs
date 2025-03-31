@@ -682,10 +682,219 @@ namespace Ceres80Emu.Emulator
 
         /************************* Rotate and Shift **************************/
 
+        /// <summary>
+        /// Rotates a register left, bit 7 to carry and to bit 0
+        /// <br/>Example: RLC A
+        /// </summary>
+        private int RLC_Reg(ref byte reg)
+        {
+            reg = RLC8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Rotates the value at a memory location pointed to by a register pair left, bit 7 to carry and to bit 0
+        /// <br/>Example: RLC (HL)
+        /// </summary>
+        private int RLC_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RLC8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Rotates a register right, bit 0 to carry and to bit 7
+        /// <br/>Example: RRC A
+        /// </summary>
+        private int RRC_Reg(ref byte reg)
+        {
+            reg = RRC8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Rotates the value at a memory location pointed to by a register pair right, bit 0 to carry and to bit 7
+        /// <br/>Example: RRC (HL)
+        /// </summary>
+        private int RRC_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RRC8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Rotates a register left, bit 7 to carry and carry to bit 0
+        /// <br/>Example: RL A
+        /// </summary>
+        private int RL_Reg(ref byte reg)
+        {
+            reg = RL8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Rotates the value at a memory location pointed to by a register pair left, bit 7 to carry and carry to bit 0
+        /// <br/>Example: RL (HL)
+        /// </summary>
+        private int RL_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RL8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Rotates a register right, bit 0 to carry and carry to bit 7
+        /// <br/>Example: RR A
+        /// </summary>
+        private int RR_Reg(ref byte reg)
+        {
+            reg = RR8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Rotates the value at a memory location pointed to by a register pair right, bit 0 to carry and carry to bit 7
+        /// <br/>Example: RR (HL)
+        /// </summary>
+        private int RR_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RR8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Shifts a register left, bit 7 to carry and 0 to bit 0
+        /// <br/>Example: SLA A
+        /// </summary>
+        private int SLA_Reg(ref byte reg)
+        {
+            reg = SLA8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Shifts the value at a memory location pointed to by a register pair left, bit 7 to carry and 0 to bit 0
+        /// <br/>Example: SLA (HL)
+        /// </summary>
+        private int SLA_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SLA8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Shifts a register right, bit 0 to carry and bit 7 unchanged
+        /// <br/>Example: SRA A
+        /// </summary>
+        private int SRA_Reg(ref byte reg)
+        {
+            reg = SRA8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Shifts the value at a memory location pointed to by a register pair right, bit 0 to carry and bit 7 unchanged
+        /// <br/>Example: SRA (HL)
+        /// </summary>
+        private int SRA_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SRA8(value));
+            return 11;
+        }
+
+        /// <summary>
+        /// Shifts a register right, bit 0 to carry and 0 to bit 7
+        /// <br/>Example: SRL A
+        /// </summary>
+        private int SRL_Reg(ref byte reg)
+        {
+            reg = SRL8(reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Shifts the value at a memory location pointed to by a register pair right, bit 0 to carry and 0 to bit 7
+        /// <br/>Example: SRL (HL)
+        /// </summary>
+        private int SRL_Reg16Ptr(ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SRL8(value));
+            return 11;
+        }
+
 
 
         /************************* Bit Manipulation **************************/
 
+        /// <summary>
+        /// Tests a bit in a register
+        /// <br/>Example: BIT 0, B
+        /// </summary>
+        private int Bit_Reg(byte bit, byte reg)
+        {
+            Bit8(bit, reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Tests a bit in the value at a memory location pointed to by a register pair
+        /// <br/>Example: BIT 0, (HL)
+        /// </summary>
+        private int Bit_Reg16Ptr(byte bit, ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            Bit8(bit, value);
+            return 8;
+        }
+
+        /// <summary>
+        /// Sets a bit in a register
+        /// <br/>Example: SET 0, B
+        /// </summary>
+        private int Set_Reg(ref byte bit, byte reg)
+        {
+            reg = Set8(bit, reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Sets a bit in the value at a memory location pointed to by a register pair
+        /// <br/>Example: SET 0, (HL)
+        /// </summary>
+        private int Set_Reg16Ptr(byte bit, ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, Set8(bit, value));
+            return 8;
+        }
+
+        /// <summary>
+        /// Resets a bit in a register
+        /// <br/>Example: RES 0, B
+        /// </summary>
+        private int Reset_Reg(ref byte bit, byte reg)
+        {
+            reg = Reset8(bit, reg);
+            return 4;
+        }
+
+        /// <summary>
+        /// Resets a bit in the value at a memory location pointed to by a register pair
+        /// <br/>Example: RES 0, (HL)
+        /// </summary>
+        private int Reset_Reg16Ptr(byte bit, ushort address)
+        {
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, Reset8(bit, value));
+            return 8;
+        }
 
 
         /********************** Jump, Call, and Return ***********************/
@@ -896,6 +1105,125 @@ namespace Ceres80Emu.Emulator
             _registers.Zero = result == 0;
             _registers.Sign = (result & 0x80) != 0;
             return result;
+        }
+
+        private byte RLC8(byte a)
+        {
+            byte bit7 = (byte)(a & 0x80);
+            a = (byte)((a << 1) | (bit7 >> 7));
+
+            _registers.Carry = bit7 != 0;
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte RRC8(byte a)
+        {
+            byte bit0 = (byte)(a & 0x01);
+            a = (byte)((a >> 1) | (bit0 << 7));
+
+            _registers.Carry = bit0 != 0;
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte RL8(byte a)
+        {
+            byte bit7 = (byte)(a & 0x80);
+            a = (byte)((a << 1) | (_registers.Carry ? 1 : 0));
+
+            _registers.Carry = bit7 != 0;
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte RR8(byte a)
+        {
+            byte bit0 = (byte)(a & 0x01);
+            a = (byte)((a >> 1) | (_registers.Carry ? 0x80 : 0));
+
+            _registers.Carry = bit0 != 0;
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte SLA8(byte a)
+        {
+            _registers.Carry = (a & 0x80) != 0;
+            a = (byte)(a << 1);
+
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte SRA8(byte a)
+        {
+            _registers.Carry = (a & 0x01) != 0;
+            a = (byte)((a & 0x80) | (a >> 1));
+
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = (a & 0x80) != 0;
+
+            return a;
+        }
+
+        private byte SRL8(byte a)
+        {
+            _registers.Carry = (a & 0x01) != 0;
+            a = (byte)(a >> 1);
+
+            _registers.Subtract = false;
+            _registers.ParityOverflow = Parity(a);
+            _registers.HalfCarry = false;
+            _registers.Zero = a == 0;
+            _registers.Sign = false;
+
+            return a;
+        }
+
+        private void Bit8(byte bit, byte a)
+        {
+            _registers.Subtract = false;
+            _registers.HalfCarry = true;
+            _registers.Zero = (a & (1 << bit)) == 0;
+        }
+
+        private byte Set8(byte bit, byte a)
+        {
+            return (byte)(a | (1 << bit));
+        }
+
+        private byte Reset8(byte bit, byte a)
+        {
+            return (byte)(a & ~(1 << bit));
         }
 
         private bool Parity(byte a)
