@@ -675,6 +675,48 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
+        /// Complements the value in A (invert all bits)
+        /// <br/>Example: CPL
+        /// </summary>
+        private int Complement_A()
+        {
+            _registers.A = (byte)~_registers.A;
+            _registers.Subtract = true;
+            _registers.HalfCarry = true;
+            return 4;
+        }
+
+        /// <summary>
+        /// Negates the value in A (two's complement)
+        /// <br./>Example: NEG
+        /// </summary>
+        private int Negate_A()
+        {
+            _registers.A = Sub8(0, _registers.A, false);
+            return 4;
+        }
+
+        /// <summary>
+        /// Inverts the carry flag
+        /// <br/>Example: CCF
+        /// </summary>
+        private int Complement_Carry()
+        {
+            _registers.Carry = !_registers.Carry;
+            return 4;
+        }
+
+        /// <summary>
+        /// Sets the carry flag
+        /// <br/>Example: SCF
+        /// </summary>
+        private int Set_Carry()
+        {
+            _registers.Carry = true;
+            return 4;
+        }
+
+        /// <summary>
         /// BCD corrects the value in A
         /// <br/>Example: DAA
         /// Implementation taken from "The Undocumented Z80 Documented" by Sean Young
@@ -882,6 +924,50 @@ namespace Ceres80Emu.Emulator
             byte value = _memoryBus.Read(address);
             _memoryBus.Write(address, SRL8(value));
             return 11;
+        }
+
+        /// <summary>
+        /// BCD Rotate Right A through (HL)
+        /// <br/>Example: RRD
+        /// </summary>
+        private int RRD()
+        {
+            byte value = _memoryBus.Read(_registers.HL);
+            byte lowNibble = (byte)(_registers.A & 0x0F);
+            byte highNibble = (byte)(value & 0x0F);
+            _registers.A = (byte)((_registers.A & 0xF0) | (value >> 4));
+            value = (byte)((value << 4) | lowNibble);
+
+            _memoryBus.Write(_registers.HL, value);
+            _registers.HalfCarry = false;
+            _registers.Subtract = false;
+            _registers.Zero = _registers.A == 0;
+            _registers.Sign = (_registers.A & 0x80) != 0;
+            _registers.ParityOverflow = Parity(_registers.A);
+
+            return 18;
+        }
+
+        /// <summary>
+        /// BCD Rotate Left A through (HL)
+        /// <br/>Example: RLD
+        /// </summary>
+        private int RLD()
+        {
+            byte value = _memoryBus.Read(_registers.HL);
+            byte lowNibble = (byte)(_registers.A & 0x0F);
+            byte highNibble = (byte)(value >> 4);
+            _registers.A = (byte)((_registers.A & 0xF0) | highNibble);
+            value = (byte)((value << 4) | lowNibble);
+
+            _memoryBus.Write(_registers.HL, value);
+            _registers.HalfCarry = false;
+            _registers.Subtract = false;
+            _registers.Zero = _registers.A == 0;
+            _registers.Sign = (_registers.A & 0x80) != 0;
+            _registers.ParityOverflow = Parity(_registers.A);
+
+            return 18;
         }
 
 
