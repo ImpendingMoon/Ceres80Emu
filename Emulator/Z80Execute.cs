@@ -730,14 +730,14 @@ namespace Ceres80Emu.Emulator
             {
                 t++;
             }
-                
+
             if (_registers.Carry || (_registers.A > 0x99))
             {
                 t += 2;
                 _registers.Carry = true;
             }
 
-            
+
             if (_registers.Subtract && !_registers.HalfCarry)
             {
                 _registers.HalfCarry = false;

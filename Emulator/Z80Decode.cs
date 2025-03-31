@@ -62,7 +62,7 @@ namespace Ceres80Emu.Emulator
             string instruction = "";
             int opcode = _memoryBus.Read(_registers.PC);
 
-            switch(opcode)
+            switch (opcode)
             {
                 case 0x00:
                 {
@@ -484,36 +484,35 @@ namespace Ceres80Emu.Emulator
                 // Load Register to Register
                 case >= 0x40 and <= 0x7F:
                 {
-
-                        byte srcCode = (byte)(opcode & 0b111);
-                        byte destCode = (byte)((opcode & 0b111000) >> 3);
-                        if (srcCode == 6) // (HL)
+                    byte srcCode = (byte)(opcode & 0b111);
+                    byte destCode = (byte)((opcode & 0b111000) >> 3);
+                    if (srcCode == 6) // (HL)
+                    {
+                        if (destCode == 6) // (HL)
                         {
-                            if (destCode == 6) // (HL)
-                            {
-                                cycles = Halt();
-                                instruction = "HALT";
-                            }
-                            else
-                            {
-                                cycles = Load_Reg_Reg16Ptr(ref GetReg(destCode), _registers.HL);
-                                instruction = $"LD {RegCodeToString(destCode)}, (HL)";
-                            }
+                            cycles = Halt();
+                            instruction = "HALT";
                         }
                         else
                         {
-                            if (destCode == 6) // (HL)
-                            {
-                                cycles = Load_Reg16Ptr_Reg(_registers.HL, GetReg(srcCode));
-                                instruction = $"LD (HL), {RegCodeToString(srcCode)}";
-                            }
-                            else
-                            {
-                                cycles = Load_Reg_Reg(ref GetReg(destCode), GetReg(srcCode));
-                                instruction = $"LD {RegCodeToString(destCode)}, {RegCodeToString(srcCode)}";
-                            }
+                            cycles = Load_Reg_Reg16Ptr(ref GetReg(destCode), _registers.HL);
+                            instruction = $"LD {RegCodeToString(destCode)}, (HL)";
                         }
-                        break;
+                    }
+                    else
+                    {
+                        if (destCode == 6) // (HL)
+                        {
+                            cycles = Load_Reg16Ptr_Reg(_registers.HL, GetReg(srcCode));
+                            instruction = $"LD (HL), {RegCodeToString(srcCode)}";
+                        }
+                        else
+                        {
+                            cycles = Load_Reg_Reg(ref GetReg(destCode), GetReg(srcCode));
+                            instruction = $"LD {RegCodeToString(destCode)}, {RegCodeToString(srcCode)}";
+                        }
+                    }
+                    break;
                 }
                 case >= 0x80 and <= 0x87:
                 {
@@ -1352,7 +1351,7 @@ namespace Ceres80Emu.Emulator
                 {
                     cycles += Load_Increment();
                     instruction = "LDIR";
-                    if(_registers.BC != 0)
+                    if (_registers.BC != 0)
                     {
                         // HACK: Negate PC increment to stay on the same instruction
                         _registers.PC--;
@@ -1365,7 +1364,7 @@ namespace Ceres80Emu.Emulator
                 {
                     cycles += Compare_Increment();
                     instruction = "CPIR";
-                    if(_registers.BC != 0)
+                    if (_registers.BC != 0)
                     {
                         _registers.PC--;
                         cycles += 5;
@@ -1458,7 +1457,7 @@ namespace Ceres80Emu.Emulator
             string instruction = "";
             int opcode = _memoryBus.Read(_registers.PC);
 
-            switch(opcode)
+            switch (opcode)
             {
                 case >= 0x00 and <= 0x07:
                 {
