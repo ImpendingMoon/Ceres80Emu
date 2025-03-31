@@ -10,12 +10,12 @@ namespace Ceres80Emu.Emulator
     {
         public MemoryBus() { }
 
-        public byte Read(ushort address)
+        public byte Read(ushort address, bool port = false)
         {
             return 0;
         }
 
-        public void Write(ushort address, byte data)
+        public void Write(ushort address, byte data, bool port = false)
         {
         }
     }
