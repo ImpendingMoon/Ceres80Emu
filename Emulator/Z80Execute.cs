@@ -49,6 +49,17 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
+        /// Loads the value pointed to by an immediate value into a register pair
+        /// <br/>Example: LD IX, (nn)
+        /// </summary>
+        private int Load_Reg16_ImmPtr(ref ushort reg)
+        {
+            ushort address = ReadImm16();
+            reg = ReadShort(address);
+            return 16;
+        }
+
+        /// <summary>
         /// Stores a register into the memory location pointed to by a register pair
         /// <br/>Example: LD (HL), A
         /// </summary>
@@ -103,7 +114,7 @@ namespace Ceres80Emu.Emulator
         /// Stores a register into the memory location pointed to by an index + offset
         /// <br/>Example: LD (IX+d), A
         /// </summary>
-        private int Load_Index_Reg(ref ushort index, byte src)
+        private int Load_Index_Reg(ushort index, byte src)
         {
             int offset = ReadImm();
             ushort address = (ushort)(index + offset);
@@ -115,7 +126,7 @@ namespace Ceres80Emu.Emulator
         /// Stores an immediate value into the memory location pointed to by an index + offset
         /// <br/>Example: LD (IX+d), n
         /// </summary>
-        private int Load_Index_Imm(ref ushort index)
+        private int Load_Index_Imm(ushort index)
         {
             byte offset = ReadImm();
             byte value = ReadImm();
@@ -1059,9 +1070,9 @@ namespace Ceres80Emu.Emulator
         /// Jumps to the address in HL
         /// <br/>Example: JP (HL)
         /// </summary>
-        private int Jump_HL()
+        private int Jump_Reg16(ushort reg)
         {
-            _registers.PC = _registers.HL;
+            _registers.PC = reg;
             return 4;
         }
 

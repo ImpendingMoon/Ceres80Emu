@@ -1626,10 +1626,211 @@ namespace Ceres80Emu.Emulator
 
             switch (opcode)
             {
+                case 0x09:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IX, _registers.BC);
+                    instruction = "ADD IX, BC";
+                    break;
+                }
+                case 0x19:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IX, _registers.DE);
+                    instruction = "ADD IX, DE";
+                    break;
+                }
+                case 0x21:
+                {
+                    cycles += Load_Reg16_Imm(ref _registers.IX);
+                    instruction = "LD IX, nn";
+                    break;
+                }
+                case 0x22:
+                {
+                    cycles += Load_ImmPtr_Reg16(_registers.IX);
+                    instruction = "LD (nn), IX";
+                    break;
+                }
+                case 0x23:
+                {
+                    cycles += Inc_Reg16(ref _registers.IX);
+                    instruction = "INC IX";
+                    break;
+                }
+                case 0x29:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IX, _registers.IX);
+                    instruction = "ADD IX, IX";
+                    break;
+                }
+                case 0x2A:
+                {
+                    cycles += Load_Reg16_ImmPtr(ref _registers.IX);
+                    instruction = "LD IX, (nn)";
+                    break;
+                }
+                case 0x2B:
+                {
+                    cycles += Dec_Reg16(ref _registers.IX);
+                    instruction = "DEC IX";
+                    break;
+                }
+                case 0x34:
+                {
+                    cycles += Inc_Index(_registers.IX);
+                    instruction = "INC (IX+d)";
+                    break;
+                }
+                case 0x35:
+                {
+                    cycles += Dec_Index(_registers.IX);
+                    instruction = "DEC (IX+d)";
+                    break;
+                }
+                case 0x36:
+                {
+                    cycles += Load_Index_Imm(_registers.IX);
+                    instruction = "LD (IX+d), n";
+                    break;
+                }
+                case 0x39:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IX, _registers.SP);
+                    instruction = "LD IX, SP";
+                    break;
+                }
+                case 0x46:
+                {
+                    cycles += Load_Reg_Index(ref _registers.B, _registers.IX);
+                    instruction = "LD B, (IX+d)";
+                    break;
+                }
+                case 0x4E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.C, _registers.IX);
+                    instruction = "LD C, (IX+d)";
+                    break;
+                }
+                case 0x56:
+                {
+                    cycles += Load_Reg_Index(ref _registers.D, _registers.IX);
+                    instruction = "LD D, (IX+d)";
+                    break;
+                }
+                case 0x5E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.E, _registers.IX);
+                    instruction = "LD E, (IX+d)";
+                    break;
+                }
+                case 0x66:
+                {
+                    cycles += Load_Reg_Index(ref _registers.H, _registers.IX);
+                    instruction = "LD H, (IX+d)";
+                    break;
+                }
+                case 0x6E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.L, _registers.IX);
+                    instruction = "LD L, (IX+d)";
+                    break;
+                }
+                case >= 0x70 and <= 0x75 or 0x77:
+                {
+                    byte regCode = (byte)(opcode & 0b111);
+                    byte reg = GetReg(regCode);
+
+                    cycles += Load_Index_Reg(_registers.IX, reg);
+                    instruction = $"LD (IX+d), {RegCodeToString(regCode)}";
+
+                    break;
+                }
+                case 0x7E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "LD A, (IX+d)";
+                    break;
+                }
+                case 0x86:
+                {
+                    cycles += Add_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "ADD A, (IX+d)";
+                    break;
+                }
+                case 0x8E:
+                {
+                    cycles += Add_Reg_Index(ref _registers.A, _registers.IX, true);
+                    instruction = "ADC A, (IX+d)";
+                    break;
+                }
+                case 0x96:
+                {
+                    cycles += Sub_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "SUB A, (IX+d)";
+                    break;
+                }
+                case 0x9E:
+                {
+                    cycles += Sub_Reg_Index(ref _registers.A, _registers.IX, true);
+                    instruction = "SBC A, (IX+d)";
+                    break;
+                }
+                case 0xA6:
+                {
+                    cycles += And_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "AND A, (IX+d)";
+                    break;
+                }
+                case 0xAE:
+                {
+                    cycles += Xor_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "XOR A, (IX+d)";
+                    break;
+                }
+                case 0xB6:
+                {
+                    cycles += Or_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "OR A, (IX+d)";
+                    break;
+                }
+                case 0xBE:
+                {
+                    cycles += Compare_Reg_Index(ref _registers.A, _registers.IX);
+                    instruction = "CP A, (IX+d)";
+                    break;
+                }
                 case 0xCB:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeIXBit();
+                    break;
+                }
+                case 0xE1:
+                {
+                    cycles += Pop_Reg16(ref _registers.IX);
+                    instruction = "POP IX";
+                    break;
+                }
+                case 0xE3:
+                {
+                    cycles += Exchange_SPPtr_Reg16(ref _registers.IX);
+                    instruction = "EX (SP), IX";
+                    break;
+                }
+                case 0xE5:
+                {
+                    cycles += Push_Reg16(_registers.IX);
+                    instruction = "PUSH IX";
+                    break;
+                }
+                case 0xE9:
+                {
+                    cycles += Jump_Reg16(_registers.IX);
+                    instruction = "JP (IX)";
+                    break;
+                }
+                case 0xF9:
+                {
+                    cycles += Load_Reg16_Reg16(ref _registers.SP, _registers.IX);
+                    instruction = "LD SP, IX";
                     break;
                 }
                 default:
@@ -1676,10 +1877,211 @@ namespace Ceres80Emu.Emulator
 
             switch (opcode)
             {
+                case 0x09:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IY, _registers.BC);
+                    instruction = "ADD IY, BC";
+                    break;
+                }
+                case 0x19:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IY, _registers.DE);
+                    instruction = "ADD IY, DE";
+                    break;
+                }
+                case 0x21:
+                {
+                    cycles += Load_Reg16_Imm(ref _registers.IY);
+                    instruction = "LD IY, nn";
+                    break;
+                }
+                case 0x22:
+                {
+                    cycles += Load_ImmPtr_Reg16(_registers.IY);
+                    instruction = "LD (nn), IY";
+                    break;
+                }
+                case 0x23:
+                {
+                    cycles += Inc_Reg16(ref _registers.IY);
+                    instruction = "INC IY";
+                    break;
+                }
+                case 0x29:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IY, _registers.IY);
+                    instruction = "ADD IY, IY";
+                    break;
+                }
+                case 0x2A:
+                {
+                    cycles += Load_Reg16_ImmPtr(ref _registers.IY);
+                    instruction = "LD IY, (nn)";
+                    break;
+                }
+                case 0x2B:
+                {
+                    cycles += Dec_Reg16(ref _registers.IY);
+                    instruction = "DEC IY";
+                    break;
+                }
+                case 0x34:
+                {
+                    cycles += Inc_Index(_registers.IY);
+                    instruction = "INC (IY+d)";
+                    break;
+                }
+                case 0x35:
+                {
+                    cycles += Dec_Index(_registers.IY);
+                    instruction = "DEC (IY+d)";
+                    break;
+                }
+                case 0x36:
+                {
+                    cycles += Load_Index_Imm(_registers.IY);
+                    instruction = "LD (IY+d), n";
+                    break;
+                }
+                case 0x39:
+                {
+                    cycles += Add_Reg16_Reg16(ref _registers.IY, _registers.SP);
+                    instruction = "LD IY, SP";
+                    break;
+                }
+                case 0x46:
+                {
+                    cycles += Load_Reg_Index(ref _registers.B, _registers.IY);
+                    instruction = "LD B, (IY+d)";
+                    break;
+                }
+                case 0x4E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.C, _registers.IY);
+                    instruction = "LD C, (IY+d)";
+                    break;
+                }
+                case 0x56:
+                {
+                    cycles += Load_Reg_Index(ref _registers.D, _registers.IY);
+                    instruction = "LD D, (IY+d)";
+                    break;
+                }
+                case 0x5E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.E, _registers.IY);
+                    instruction = "LD E, (IY+d)";
+                    break;
+                }
+                case 0x66:
+                {
+                    cycles += Load_Reg_Index(ref _registers.H, _registers.IY);
+                    instruction = "LD H, (IY+d)";
+                    break;
+                }
+                case 0x6E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.L, _registers.IY);
+                    instruction = "LD L, (IY+d)";
+                    break;
+                }
+                case >= 0x70 and <= 0x75 or 0x77:
+                {
+                    byte regCode = (byte)(opcode & 0b111);
+                    byte reg = GetReg(regCode);
+
+                    cycles += Load_Index_Reg(_registers.IY, reg);
+                    instruction = $"LD (IY+d), {RegCodeToString(regCode)}";
+
+                    break;
+                }
+                case 0x7E:
+                {
+                    cycles += Load_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "LD A, (IY+d)";
+                    break;
+                }
+                case 0x86:
+                {
+                    cycles += Add_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "ADD A, (IY+d)";
+                    break;
+                }
+                case 0x8E:
+                {
+                    cycles += Add_Reg_Index(ref _registers.A, _registers.IY, true);
+                    instruction = "ADC A, (IY+d)";
+                    break;
+                }
+                case 0x96:
+                {
+                    cycles += Sub_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "SUB A, (IY+d)";
+                    break;
+                }
+                case 0x9E:
+                {
+                    cycles += Sub_Reg_Index(ref _registers.A, _registers.IY, true);
+                    instruction = "SBC A, (IY+d)";
+                    break;
+                }
+                case 0xA6:
+                {
+                    cycles += And_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "AND A, (IY+d)";
+                    break;
+                }
+                case 0xAE:
+                {
+                    cycles += Xor_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "XOR A, (IY+d)";
+                    break;
+                }
+                case 0xB6:
+                {
+                    cycles += Or_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "OR A, (IY+d)";
+                    break;
+                }
+                case 0xBE:
+                {
+                    cycles += Compare_Reg_Index(ref _registers.A, _registers.IY);
+                    instruction = "CP A, (IY+d)";
+                    break;
+                }
                 case 0xCB:
                 {
-                    _registers.PC++;
                     (cycles, instruction) = DecodeIYBit();
+                    break;
+                }
+                case 0xE1:
+                {
+                    cycles += Pop_Reg16(ref _registers.IY);
+                    instruction = "POP IY";
+                    break;
+                }
+                case 0xE3:
+                {
+                    cycles += Exchange_SPPtr_Reg16(ref _registers.IY);
+                    instruction = "EX (SP), IY";
+                    break;
+                }
+                case 0xE5:
+                {
+                    cycles += Push_Reg16(_registers.IY);
+                    instruction = "PUSH IY";
+                    break;
+                }
+                case 0xE9:
+                {
+                    cycles += Jump_Reg16(_registers.IY);
+                    instruction = "JP (IY)";
+                    break;
+                }
+                case 0xF9:
+                {
+                    cycles += Load_Reg16_Reg16(ref _registers.SP, _registers.IY);
+                    instruction = "LD SP, IY";
                     break;
                 }
                 default:
