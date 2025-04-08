@@ -10,7 +10,14 @@ namespace Ceres80Emu.Emulator
     {
         public MemoryBus() { }
 
-        public byte Read(ushort address, bool port = false)
+        /// <summary>
+        /// Reads a byte from the memory bus.
+        /// </summary>
+        /// <param name="address">Address to read from. Ports only use the lower byte (0-255)</param>
+        /// <param name="port">Address a device through a port</param>
+        /// <param name="fetch">Whether this is an instruction fetch. Used for breakpoints</param>
+        /// <returns></returns>
+        public byte Read(ushort address, bool port = false, bool fetch = false)
         {
             if(port)
             {
@@ -24,6 +31,12 @@ namespace Ceres80Emu.Emulator
             return _ram.Read((ushort)(address - 0x8000));
         }
 
+        /// <summary>
+        /// Writes a byte to the memory bus.
+        /// </summary>
+        /// <param name="address">Address to write to. Ports only use the lower byte (0-255)</param>
+        /// <param name="data">Value to write</param>
+        /// <param name="port">Address a device through a port</param>
         public void Write(ushort address, byte data, bool port = false)
         {
             if(port)

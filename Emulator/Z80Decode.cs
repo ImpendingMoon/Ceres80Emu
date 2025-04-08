@@ -30,7 +30,7 @@ namespace Ceres80Emu.Emulator
             string instruction = "";
 
             ushort startAddress = _registers.PC;
-            byte opcode = ReadImm();
+            byte opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -88,7 +88,7 @@ namespace Ceres80Emu.Emulator
         {
             int cycles = 0;
             string instruction = "";
-            int opcode = ReadImm();
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1067,7 +1067,7 @@ namespace Ceres80Emu.Emulator
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1489,7 +1489,7 @@ namespace Ceres80Emu.Emulator
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1622,7 +1622,7 @@ namespace Ceres80Emu.Emulator
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1851,7 +1851,7 @@ namespace Ceres80Emu.Emulator
             // Took 8 cycles to read first two bytes of opcode
             int cycles = 8;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1948,7 +1948,7 @@ namespace Ceres80Emu.Emulator
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -2177,7 +2177,7 @@ namespace Ceres80Emu.Emulator
             // Took 8 cycles to read first two bytes of opcode
             int cycles = 8;
             string instruction = "";
-            int opcode = _memoryBus.Read(_registers.PC);
+            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -2305,11 +2305,20 @@ namespace Ceres80Emu.Emulator
                 return "H";
                 case 5:
                 return "L";
+                case 6:
+                return "(HL)";
                 case 7:
                 return "A";
                 default:
                 throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private byte FetchInstruction()
+        {
+            byte opcode = _memoryBus.Read(_registers.PC, false, true);
+            _registers.PC++;
+            return opcode;
         }
     }
 }
