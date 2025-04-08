@@ -29,7 +29,7 @@ namespace Ceres80Emu.Emulator
             int cycles = 0;
             string instruction = "";
 
-            ushort address = _registers.PC;
+            ushort startAddress = _registers.PC;
             byte opcode = ReadImm();
 
             switch (opcode)
@@ -69,16 +69,16 @@ namespace Ceres80Emu.Emulator
             }
 
             // Memory Refresh Register (7-bit)
-            _registers.R++;
-            if (_registers.R == 128)
+            if (_registers.R == 127)
             {
-                _registers.R = 0;
+                _registers.R &= 0b10000000; // Bit 7 is preserved on hardware
             }
+            _registers.R++;
 
             // Repeaat instructions (LDIR, LDDR, etc.) stay on the same instruction until BC is 0
-            if (_runningRepeatInstruction) { _registers.PC = address; }
+            if (_runningRepeatInstruction) { _registers.PC = startAddress; }
 
-            Console.WriteLine($"Z80: Executed instruction: {instruction} at {address:X04}");
+            Console.WriteLine($"Z80: Executed instruction: {instruction} at {startAddress:X04}");
             return cycles;
         }
 
@@ -94,7 +94,7 @@ namespace Ceres80Emu.Emulator
             {
                 case 0x00:
                 {
-                    cycles = No_Operation();
+                    cycles += No_Operation();
                     instruction = "NOP";
                     break;
                 }
@@ -102,267 +102,267 @@ namespace Ceres80Emu.Emulator
                 {
                     // Cannot pass method get property by reference
                     ushort temp = _registers.BC;
-                    cycles = Load_Reg16_Imm(ref temp);
+                    cycles += Load_Reg16_Imm(ref temp);
                     _registers.BC = temp;
                     instruction = "LD BC, nn";
                     break;
                 }
                 case 0x02:
                 {
-                    cycles = Load_Reg16Ptr_Reg(_registers.BC, _registers.A);
+                    cycles += Load_Reg16Ptr_Reg(_registers.BC, _registers.A);
                     instruction = "LD (BC), A";
                     break;
                 }
                 case 0x03:
                 {
                     ushort temp = _registers.BC;
-                    cycles = Inc_Reg16(ref temp);
+                    cycles += Inc_Reg16(ref temp);
                     _registers.BC = temp;
                     instruction = "INC BC";
                     break;
                 }
                 case 0x04:
                 {
-                    cycles = Inc_Reg(ref _registers.B);
+                    cycles += Inc_Reg(ref _registers.B);
                     instruction = "INC B";
                     break;
                 }
                 case 0x05:
                 {
-                    cycles = Dec_Reg(ref _registers.B);
+                    cycles += Dec_Reg(ref _registers.B);
                     instruction = "DEC B";
                     break;
                 }
                 case 0x06:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.B);
+                    cycles += Load_Reg_Imm(ref _registers.B);
                     instruction = "LD B, n";
                     break;
                 }
                 case 0x07:
                 {
-                    cycles = RLC_Reg(ref _registers.A);
+                    cycles += RLC_Reg(ref _registers.A);
                     instruction = "RLCA";
                     break;
                 }
                 case 0x08:
                 {
-                    cycles = Exchange_AF();
+                    cycles += Exchange_AF();
                     instruction = "EX AF, AF'";
                     break;
                 }
                 case 0x09:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Add_Reg16_Reg16(ref temp, _registers.BC);
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.BC);
                     _registers.HL = temp;
                     instruction = "ADD HL, BC";
                     break;
                 }
                 case 0x0A:
                 {
-                    cycles = Load_Reg_Reg16Ptr(ref _registers.A, _registers.BC);
+                    cycles += Load_Reg_Reg16Ptr(ref _registers.A, _registers.BC);
                     instruction = "LD A, (BC)";
                     break;
                 }
                 case 0x0B:
                 {
                     ushort temp = _registers.BC;
-                    cycles = Dec_Reg16(ref temp);
+                    cycles += Dec_Reg16(ref temp);
                     _registers.BC = temp;
                     instruction = "DEC BC";
                     break;
                 }
                 case 0x0C:
                 {
-                    cycles = Inc_Reg(ref _registers.C);
+                    cycles += Inc_Reg(ref _registers.C);
                     instruction = "INC C";
                     break;
                 }
                 case 0x0D:
                 {
-                    cycles = Dec_Reg(ref _registers.C);
+                    cycles += Dec_Reg(ref _registers.C);
                     instruction = "DEC C";
                     break;
                 }
                 case 0x0E:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.C);
+                    cycles += Load_Reg_Imm(ref _registers.C);
                     instruction = "LD C, n";
                     break;
                 }
                 case 0x0F:
                 {
-                    cycles = RRC_Reg(ref _registers.A);
+                    cycles += RRC_Reg(ref _registers.A);
                     instruction = "RRCA";
                     break;
                 }
                 case 0x10:
                 {
-                    cycles = Dec_Jump_Not_Zero();
+                    cycles += Dec_Jump_Not_Zero();
                     instruction = "DJNZ d";
                     break;
                 }
                 case 0x11:
                 {
                     ushort temp = _registers.DE;
-                    cycles = Load_Reg16_Imm(ref temp);
+                    cycles += Load_Reg16_Imm(ref temp);
                     _registers.DE = temp;
                     instruction = "LD DE, nn";
                     break;
                 }
                 case 0x12:
                 {
-                    cycles = Load_Reg16Ptr_Reg(_registers.DE, _registers.A);
+                    cycles += Load_Reg16Ptr_Reg(_registers.DE, _registers.A);
                     instruction = "LD (DE), A";
                     break;
                 }
                 case 0x13:
                 {
                     ushort temp = _registers.DE;
-                    cycles = Inc_Reg16(ref temp);
+                    cycles += Inc_Reg16(ref temp);
                     _registers.DE = temp;
                     instruction = "INC DE";
                     break;
                 }
                 case 0x14:
                 {
-                    cycles = Inc_Reg(ref _registers.D);
+                    cycles += Inc_Reg(ref _registers.D);
                     instruction = "INC D";
                     break;
                 }
                 case 0x15:
                 {
-                    cycles = Dec_Reg(ref _registers.D);
+                    cycles += Dec_Reg(ref _registers.D);
                     instruction = "DEC D";
                     break;
                 }
                 case 0x16:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.D);
+                    cycles += Load_Reg_Imm(ref _registers.D);
                     instruction = "LD D, n";
                     break;
                 }
                 case 0x17:
                 {
-                    cycles = RL_Reg(ref _registers.A);
+                    cycles += RL_Reg(ref _registers.A);
                     instruction = "RLA";
                     break;
                 }
                 case 0x18:
                 {
-                    cycles = Jump_Relative();
+                    cycles += Jump_Relative();
                     instruction = "JR d";
                     break;
                 }
                 case 0x19:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Add_Reg16_Reg16(ref temp, _registers.DE);
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.DE);
                     _registers.HL = temp;
                     instruction = "ADD HL, DE";
                     break;
                 }
                 case 0x1A:
                 {
-                    cycles = Load_Reg_Reg16Ptr(ref _registers.A, _registers.DE);
+                    cycles += Load_Reg_Reg16Ptr(ref _registers.A, _registers.DE);
                     instruction = "LD A, (DE)";
                     break;
                 }
                 case 0x1B:
                 {
                     ushort temp = _registers.DE;
-                    cycles = Dec_Reg16(ref temp);
+                    cycles += Dec_Reg16(ref temp);
                     _registers.DE = temp;
                     instruction = "DEC DE";
                     break;
                 }
                 case 0x1C:
                 {
-                    cycles = Inc_Reg(ref _registers.E);
+                    cycles += Inc_Reg(ref _registers.E);
                     instruction = "INC E";
                     break;
                 }
                 case 0x1D:
                 {
-                    cycles = Dec_Reg(ref _registers.E);
+                    cycles += Dec_Reg(ref _registers.E);
                     instruction = "DEC E";
                     break;
                 }
                 case 0x1E:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.E);
+                    cycles += Load_Reg_Imm(ref _registers.E);
                     instruction = "LD E, n";
                     break;
                 }
                 case 0x1F:
                 {
-                    cycles = RR_Reg(ref _registers.A);
+                    cycles += RR_Reg(ref _registers.A);
                     instruction = "RRA";
                     break;
                 }
                 case 0x20:
                 {
-                    cycles = Jump_Relative(!_registers.Zero);
+                    cycles += Jump_Relative(!_registers.Zero);
                     instruction = "JR NZ, d";
                     break;
                 }
                 case 0x21:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Load_Reg16_Imm(ref temp);
+                    cycles += Load_Reg16_Imm(ref temp);
                     _registers.HL = temp;
                     instruction = "LD HL, nn";
                     break;
                 }
                 case 0x22:
                 {
-                    cycles = Load_ImmPtr_Reg16(_registers.HL);
+                    cycles += Load_ImmPtr_Reg16(_registers.HL);
                     instruction = "LD (nn), HL";
                     break;
                 }
                 case 0x23:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Inc_Reg16(ref temp);
+                    cycles += Inc_Reg16(ref temp);
                     _registers.HL = temp;
                     instruction = "INC HL";
                     break;
                 }
                 case 0x24:
                 {
-                    cycles = Inc_Reg(ref _registers.H);
+                    cycles += Inc_Reg(ref _registers.H);
                     instruction = "INC H";
                     break;
                 }
                 case 0x25:
                 {
-                    cycles = Dec_Reg(ref _registers.H);
+                    cycles += Dec_Reg(ref _registers.H);
                     instruction = "DEC H";
                     break;
                 }
                 case 0x26:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.H);
+                    cycles += Load_Reg_Imm(ref _registers.H);
                     instruction = "LD H, n";
                     break;
                 }
                 case 0x27:
                 {
-                    cycles = Decimal_Adjust_A();
+                    cycles += Decimal_Adjust_A();
                     instruction = "DAA";
                     break;
                 }
                 case 0x28:
                 {
-                    cycles = Jump_Relative(_registers.Zero);
+                    cycles += Jump_Relative(_registers.Zero);
                     instruction = "JR Z, d";
                     break;
                 }
                 case 0x29:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Add_Reg16_Reg16(ref temp, _registers.HL);
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.HL);
                     _registers.HL = temp;
                     instruction = "ADD HL, HL";
                     break;
@@ -370,7 +370,7 @@ namespace Ceres80Emu.Emulator
                 case 0x2A:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Load_Reg16_Imm(ref temp);
+                    cycles += Load_Reg16_Imm(ref temp);
                     _registers.HL = temp;
                     instruction = "LD HL, (nn)";
                     break;
@@ -378,134 +378,134 @@ namespace Ceres80Emu.Emulator
                 case 0x2B:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Dec_Reg16(ref temp);
+                    cycles += Dec_Reg16(ref temp);
                     _registers.HL = temp;
                     instruction = "DEC HL";
                     break;
                 }
                 case 0x2C:
                 {
-                    cycles = Inc_Reg(ref _registers.L);
+                    cycles += Inc_Reg(ref _registers.L);
                     instruction = "INC L";
                     break;
                 }
                 case 0x2D:
                 {
-                    cycles = Dec_Reg(ref _registers.L);
+                    cycles += Dec_Reg(ref _registers.L);
                     instruction = "DEC L";
                     break;
                 }
                 case 0x2E:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.L);
+                    cycles += Load_Reg_Imm(ref _registers.L);
                     instruction = "LD L, n";
                     break;
                 }
                 case 0x2F:
                 {
-                    cycles = Complement_A();
+                    cycles += Complement_A();
                     instruction = "CPL";
                     break;
                 }
                 case 0x30:
                 {
-                    cycles = Jump_Relative(!_registers.Carry);
+                    cycles += Jump_Relative(!_registers.Carry);
                     instruction = "JR NC, d";
                     break;
                 }
                 case 0x31:
                 {
-                    cycles = Load_Reg16_Imm(ref _registers.SP);
+                    cycles += Load_Reg16_Imm(ref _registers.SP);
                     instruction = "LD SP, nn";
                     break;
                 }
                 case 0x32:
                 {
-                    cycles = Load_ImmPtr_Reg(_registers.HL, _registers.A);
+                    cycles += Load_ImmPtr_Reg(_registers.HL, _registers.A);
                     instruction = "LD (nn), A";
                     break;
                 }
                 case 0x33:
                 {
                     ushort temp = _registers.SP;
-                    cycles = Inc_Reg16(ref temp);
+                    cycles += Inc_Reg16(ref temp);
                     _registers.SP = temp;
                     instruction = "INC SP";
                     break;
                 }
                 case 0x34:
                 {
-                    cycles = Inc_Reg16Ptr(_registers.HL);
+                    cycles += Inc_Reg16Ptr(_registers.HL);
                     instruction = "INC (HL)";
                     break;
                 }
                 case 0x35:
                 {
-                    cycles = Dec_Reg16Ptr(_registers.HL);
+                    cycles += Dec_Reg16Ptr(_registers.HL);
                     instruction = "DEC (HL)";
                     break;
                 }
                 case 0x36:
                 {
-                    cycles = Load_Reg16Ptr_Imm(_registers.HL);
+                    cycles += Load_Reg16Ptr_Imm(_registers.HL);
                     instruction = "LD (HL), n";
                     break;
                 }
                 case 0x37:
                 {
-                    cycles = Set_Carry();
+                    cycles += Set_Carry();
                     instruction = "SCF";
                     break;
                 }
                 case 0x38:
                 {
-                    cycles = Jump_Relative(_registers.Carry);
+                    cycles += Jump_Relative(_registers.Carry);
                     instruction = "JR C, d";
                     break;
                 }
                 case 0x39:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Add_Reg16_Reg16(ref temp, _registers.SP);
+                    cycles += Add_Reg16_Reg16(ref temp, _registers.SP);
                     _registers.HL = temp;
                     instruction = "ADD HL, SP";
                     break;
                 }
                 case 0x3A:
                 {
-                    cycles = Load_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                    cycles += Load_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                     instruction = "LD A, (nn)";
                     break;
                 }
                 case 0x3B:
                 {
                     ushort temp = _registers.SP;
-                    cycles = Dec_Reg16(ref temp);
+                    cycles += Dec_Reg16(ref temp);
                     _registers.SP = temp;
                     instruction = "DEC SP";
                     break;
                 }
                 case 0x3C:
                 {
-                    cycles = Inc_Reg(ref _registers.A);
+                    cycles += Inc_Reg(ref _registers.A);
                     instruction = "INC A";
                     break;
                 }
                 case 0x3D:
                 {
-                    cycles = Dec_Reg(ref _registers.A);
+                    cycles += Dec_Reg(ref _registers.A);
                     instruction = "DEC A";
                     break;
                 }
                 case 0x3E:
                 {
-                    cycles = Load_Reg_Imm(ref _registers.A);
+                    cycles += Load_Reg_Imm(ref _registers.A);
                     instruction = "LD A, n";
                     break;
                 }
                 case 0x3F:
                 {
-                    cycles = Complement_Carry();
+                    cycles += Complement_Carry();
                     instruction = "CCF";
                     break;
                 }
@@ -518,12 +518,12 @@ namespace Ceres80Emu.Emulator
                     {
                         if (destCode == 6) // (HL)
                         {
-                            cycles = Halt();
+                            cycles += Halt();
                             instruction = "HALT";
                         }
                         else
                         {
-                            cycles = Load_Reg_Reg16Ptr(ref GetReg(destCode), _registers.HL);
+                            cycles += Load_Reg_Reg16Ptr(ref GetReg(destCode), _registers.HL);
                             instruction = $"LD {RegCodeToString(destCode)}, (HL)";
                         }
                     }
@@ -531,12 +531,12 @@ namespace Ceres80Emu.Emulator
                     {
                         if (destCode == 6) // (HL)
                         {
-                            cycles = Load_Reg16Ptr_Reg(_registers.HL, GetReg(srcCode));
+                            cycles += Load_Reg16Ptr_Reg(_registers.HL, GetReg(srcCode));
                             instruction = $"LD (HL), {RegCodeToString(srcCode)}";
                         }
                         else
                         {
-                            cycles = Load_Reg_Reg(ref GetReg(destCode), GetReg(srcCode));
+                            cycles += Load_Reg_Reg(ref GetReg(destCode), GetReg(srcCode));
                             instruction = $"LD {RegCodeToString(destCode)}, {RegCodeToString(srcCode)}";
                         }
                     }
@@ -548,12 +548,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Add_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                        cycles += Add_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                         instruction = "ADD A, (HL)";
                     }
                     else
                     {
-                        cycles = Add_Reg_Reg(ref _registers.A, GetReg(regCode));
+                        cycles += Add_Reg_Reg(ref _registers.A, GetReg(regCode));
                         instruction = $"ADD A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -565,12 +565,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Add_Reg_Reg16Ptr(ref _registers.A, _registers.HL, true);
+                        cycles += Add_Reg_Reg16Ptr(ref _registers.A, _registers.HL, true);
                         instruction = "ADC A, (HL)";
                     }
                     else
                     {
-                        cycles = Add_Reg_Reg(ref _registers.A, GetReg(regCode), true);
+                        cycles += Add_Reg_Reg(ref _registers.A, GetReg(regCode), true);
                         instruction = $"ADC A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -582,12 +582,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Sub_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                        cycles += Sub_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                         instruction = "SUB A, (HL)";
                     }
                     else
                     {
-                        cycles = Sub_Reg_Reg(ref _registers.A, GetReg(regCode));
+                        cycles += Sub_Reg_Reg(ref _registers.A, GetReg(regCode));
                         instruction = $"SUB A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -599,12 +599,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Sub_Reg_Reg16Ptr(ref _registers.A, _registers.HL, true);
+                        cycles += Sub_Reg_Reg16Ptr(ref _registers.A, _registers.HL, true);
                         instruction = "SBC A, (HL)";
                     }
                     else
                     {
-                        cycles = Sub_Reg_Reg(ref _registers.A, GetReg(regCode), true);
+                        cycles += Sub_Reg_Reg(ref _registers.A, GetReg(regCode), true);
                         instruction = $"SBC A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -616,12 +616,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = And_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                        cycles += And_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                         instruction = "AND A, (HL)";
                     }
                     else
                     {
-                        cycles = And_Reg_Reg(ref _registers.A, GetReg(regCode));
+                        cycles += And_Reg_Reg(ref _registers.A, GetReg(regCode));
                         instruction = $"AND A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -633,12 +633,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Xor_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                        cycles += Xor_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                         instruction = "XOR A, (HL)";
                     }
                     else
                     {
-                        cycles = Xor_Reg_Reg(ref _registers.A, GetReg(regCode));
+                        cycles += Xor_Reg_Reg(ref _registers.A, GetReg(regCode));
                         instruction = $"XOR A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -650,12 +650,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Or_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                        cycles += Or_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
                         instruction = "OR A, (HL)";
                     }
                     else
                     {
-                        cycles = Or_Reg_Reg(ref _registers.A, GetReg(regCode));
+                        cycles += Or_Reg_Reg(ref _registers.A, GetReg(regCode));
                         instruction = $"OR A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -667,12 +667,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Compare_Reg_Reg16Ptr(_registers.A, _registers.HL);
+                        cycles += Compare_Reg_Reg16Ptr(_registers.A, _registers.HL);
                         instruction = "CP A, (HL)";
                     }
                     else
                     {
-                        cycles = Compare_Reg_Reg(_registers.A, GetReg(regCode));
+                        cycles += Compare_Reg_Reg(_registers.A, GetReg(regCode));
                         instruction = $"CP A, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -680,377 +680,377 @@ namespace Ceres80Emu.Emulator
 
                 case 0xC0:
                 {
-                    cycles = Return(!_registers.Zero);
+                    cycles += Return(!_registers.Zero);
                     instruction = "RET NZ";
                     break;
                 }
                 case 0xC1:
                 {
                     ushort temp = _registers.BC;
-                    cycles = Pop_Reg16(ref temp);
+                    cycles += Pop_Reg16(ref temp);
                     _registers.BC = temp;
                     instruction = "POP BC";
                     break;
                 }
                 case 0xC2:
                 {
-                    cycles = Jump(!_registers.Zero);
+                    cycles += Jump(!_registers.Zero);
                     instruction = "JP NZ, nn";
                     break;
                 }
                 case 0xC3:
                 {
-                    cycles = Jump();
+                    cycles += Jump();
                     instruction = "JP nn";
                     break;
                 }
                 case 0xC4:
                 {
-                    cycles = Call(!_registers.Zero);
+                    cycles += Call(!_registers.Zero);
                     instruction = "CALL NZ, nn";
                     break;
                 }
                 case 0xC5:
                 {
-                    cycles = Push_Reg16(_registers.BC);
+                    cycles += Push_Reg16(_registers.BC);
                     instruction = "PUSH BC";
                     break;
                 }
                 case 0xC6:
                 {
-                    cycles = Add_Reg_Imm(ref _registers.A);
+                    cycles += Add_Reg_Imm(ref _registers.A);
                     instruction = "ADD A, n";
                     break;
                 }
                 case 0xC7:
                 {
-                    cycles = Reset(0x00);
+                    cycles += Reset(0x00);
                     instruction = "RST 00H";
                     break;
                 }
                 case 0xC8:
                 {
-                    cycles = Return(_registers.Zero);
+                    cycles += Return(_registers.Zero);
                     instruction = "RET Z";
                     break;
                 }
                 case 0xC9:
                 {
-                    cycles = Return();
+                    cycles += Return();
                     instruction = "RET";
                     break;
                 }
                 case 0xCA:
                 {
-                    cycles = Jump(_registers.Zero);
+                    cycles += Jump(_registers.Zero);
                     instruction = "JP Z, nn";
                     break;
                 }
                 case 0xCC:
                 {
-                    cycles = Call(_registers.Zero);
+                    cycles += Call(_registers.Zero);
                     instruction = "CALL Z, nn";
                     break;
                 }
                 case 0xCD:
                 {
-                    cycles = Call();
+                    cycles += Call();
                     instruction = "CALL nn";
                     break;
                 }
                 case 0xCE:
                 {
-                    cycles = Add_Reg_Imm(ref _registers.A, true);
+                    cycles += Add_Reg_Imm(ref _registers.A, true);
                     instruction = "ADC A, n";
                     break;
                 }
                 case 0xCF:
                 {
-                    cycles = Reset(0x08);
+                    cycles += Reset(0x08);
                     instruction = "RST 08H";
                     break;
                 }
                 case 0xD0:
                 {
-                    cycles = Return(!_registers.Carry);
+                    cycles += Return(!_registers.Carry);
                     instruction = "RET NC";
                     break;
                 }
                 case 0xD1:
                 {
                     ushort temp = _registers.DE;
-                    cycles = Pop_Reg16(ref temp);
+                    cycles += Pop_Reg16(ref temp);
                     _registers.DE = temp;
                     instruction = "POP DE";
                     break;
                 }
                 case 0xD2:
                 {
-                    cycles = Jump(!_registers.Carry);
+                    cycles += Jump(!_registers.Carry);
                     instruction = "JP NC, nn";
                     break;
                 }
                 case 0xD3:
                 {
-                    cycles = Out_Reg(_registers.A);
+                    cycles += Out_Reg(_registers.A);
                     instruction = "OUT (n), A";
                     break;
                 }
                 case 0xD4:
                 {
-                    cycles = Call(!_registers.Carry);
+                    cycles += Call(!_registers.Carry);
                     instruction = "CALL NC, nn";
                     break;
                 }
                 case 0xD5:
                 {
-                    cycles = Push_Reg16(_registers.DE);
+                    cycles += Push_Reg16(_registers.DE);
                     instruction = "PUSH DE";
                     break;
                 }
                 case 0xD6:
                 {
-                    cycles = Sub_Reg_Imm(ref _registers.A);
+                    cycles += Sub_Reg_Imm(ref _registers.A);
                     instruction = "SUB A, n";
                     break;
                 }
                 case 0xD7:
                 {
-                    cycles = Reset(0x10);
+                    cycles += Reset(0x10);
                     instruction = "RST 10H";
                     break;
                 }
                 case 0xD8:
                 {
-                    cycles = Return(_registers.Carry);
+                    cycles += Return(_registers.Carry);
                     instruction = "RET C";
                     break;
                 }
                 case 0xD9:
                 {
-                    cycles = Exchange_X();
+                    cycles += Exchange_X();
                     instruction = "EXX";
                     break;
                 }
                 case 0xDA:
                 {
-                    cycles = Jump(_registers.Carry);
+                    cycles += Jump(_registers.Carry);
                     instruction = "JP C, nn";
                     break;
                 }
                 case 0xDB:
                 {
-                    cycles = In_Reg(ref _registers.A);
+                    cycles += In_Reg(ref _registers.A);
                     instruction = "IN A, (n)";
                     break;
                 }
                 case 0xDC:
                 {
-                    cycles = Call(_registers.Carry);
+                    cycles += Call(_registers.Carry);
                     instruction = "CALL C, nn";
                     break;
                 }
                 case 0xDE:
                 {
-                    cycles = Sub_Reg_Imm(ref _registers.A, true);
+                    cycles += Sub_Reg_Imm(ref _registers.A, true);
                     instruction = "SBC A, n";
                     break;
                 }
                 case 0xDF:
                 {
-                    cycles = Reset(0x18);
+                    cycles += Reset(0x18);
                     instruction = "RST 18H";
                     break;
                 }
                 case 0xE0:
                 {
-                    cycles = Return(!_registers.ParityOverflow);
+                    cycles += Return(!_registers.ParityOverflow);
                     instruction = "RET PO";
                     break;
                 }
                 case 0xE1:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Pop_Reg16(ref temp);
+                    cycles += Pop_Reg16(ref temp);
                     _registers.HL = temp;
                     instruction = "POP HL";
                     break;
                 }
                 case 0xE2:
                 {
-                    cycles = Jump(!_registers.ParityOverflow);
+                    cycles += Jump(!_registers.ParityOverflow);
                     instruction = "JP PO, nn";
                     break;
                 }
                 case 0xE3:
                 {
                     ushort temp = _registers.HL;
-                    cycles = Exchange_SPPtr_Reg16(ref temp);
+                    cycles += Exchange_SPPtr_Reg16(ref temp);
                     _registers.HL = temp;
                     instruction = "EX (SP), HL";
                     break;
                 }
                 case 0xE4:
                 {
-                    cycles = Call(!_registers.ParityOverflow);
+                    cycles += Call(!_registers.ParityOverflow);
                     instruction = "CALL PO, nn";
                     break;
                 }
                 case 0xE5:
                 {
-                    cycles = Push_Reg16(_registers.HL);
+                    cycles += Push_Reg16(_registers.HL);
                     instruction = "PUSH HL";
                     break;
                 }
                 case 0xE6:
                 {
-                    cycles = And_Reg_Imm(ref _registers.A);
+                    cycles += And_Reg_Imm(ref _registers.A);
                     instruction = "AND A, n";
                     break;
                 }
                 case 0xE7:
                 {
-                    cycles = Reset(0x20);
+                    cycles += Reset(0x20);
                     instruction = "RST 20H";
                     break;
                 }
                 case 0xE8:
                 {
-                    cycles = Return(_registers.ParityOverflow);
+                    cycles += Return(_registers.ParityOverflow);
                     instruction = "RET PE";
                     break;
                 }
                 case 0xE9:
                 {
-                    cycles = Jump_HL();
+                    cycles += Jump_Reg16(_registers.HL);
                     instruction = "JP (HL)";
                     break;
                 }
                 case 0xEA:
                 {
-                    cycles = Jump(_registers.ParityOverflow);
+                    cycles += Jump(_registers.ParityOverflow);
                     instruction = "JP PE, nn";
                     break;
                 }
                 case 0xEB:
                 {
-                    cycles = Exchange_DE_HL();
+                    cycles += Exchange_DE_HL();
                     instruction = "EX DE, HL";
                     break;
                 }
                 case 0xEC:
                 {
-                    cycles = Call(_registers.ParityOverflow);
+                    cycles += Call(_registers.ParityOverflow);
                     instruction = "CALL PE, nn";
                     break;
                 }
                 case 0xEE:
                 {
-                    cycles = Xor_Reg_Imm(ref _registers.A);
+                    cycles += Xor_Reg_Imm(ref _registers.A);
                     instruction = "XOR A, n";
                     break;
                 }
                 case 0xEF:
                 {
-                    cycles = Reset(0x28);
+                    cycles += Reset(0x28);
                     instruction = "RST 28H";
                     break;
                 }
                 case 0xF0:
                 {
-                    cycles = Return(!_registers.Sign);
+                    cycles += Return(!_registers.Sign);
                     instruction = "RET P";
                     break;
                 }
                 case 0xF1:
                 {
                     ushort temp = _registers.AF;
-                    cycles = Pop_Reg16(ref temp);
+                    cycles += Pop_Reg16(ref temp);
                     _registers.AF = temp;
                     instruction = "POP AF";
                     break;
                 }
                 case 0xF2:
                 {
-                    cycles = Jump(!_registers.Sign);
+                    cycles += Jump(!_registers.Sign);
                     instruction = "JP P, nn";
                     break;
                 }
                 case 0xF3:
                 {
-                    cycles = Disable_Interrupts();
+                    cycles += Disable_Interrupts();
                     instruction = "DI";
                     break;
                 }
                 case 0xF4:
                 {
-                    cycles = Call(!_registers.Sign);
+                    cycles += Call(!_registers.Sign);
                     instruction = "CALL P, nn";
                     break;
                 }
                 case 0xF5:
                 {
-                    cycles = Push_Reg16(_registers.AF);
+                    cycles += Push_Reg16(_registers.AF);
                     instruction = "PUSH AF";
                     break;
                 }
                 case 0xF6:
                 {
-                    cycles = Or_Reg_Imm(ref _registers.A);
+                    cycles += Or_Reg_Imm(ref _registers.A);
                     instruction = "OR A, n";
                     break;
                 }
                 case 0xF7:
                 {
-                    cycles = Reset(0x30);
+                    cycles += Reset(0x30);
                     instruction = "RST 30H";
                     break;
                 }
                 case 0xF8:
                 {
-                    cycles = Return(_registers.Sign);
+                    cycles += Return(_registers.Sign);
                     instruction = "RET M";
                     break;
                 }
                 case 0xF9:
                 {
-                    cycles = Load_Reg16_Reg16(ref _registers.SP, _registers.HL);
+                    cycles += Load_Reg16_Reg16(ref _registers.SP, _registers.HL);
                     instruction = "LD SP, HL";
                     break;
                 }
                 case 0xFA:
                 {
-                    cycles = Jump(_registers.Sign);
+                    cycles += Jump(_registers.Sign);
                     instruction = "JP M, nn";
                     break;
                 }
                 case 0xFB:
                 {
-                    cycles = Enable_Interrupts();
+                    cycles += Enable_Interrupts();
                     instruction = "EI";
                     break;
                 }
                 case 0xFC:
                 {
-                    cycles = Call(_registers.Sign);
+                    cycles += Call(_registers.Sign);
                     instruction = "CALL M, nn";
                     break;
                 }
                 case 0xFE:
                 {
-                    cycles = Compare_Reg_Imm(_registers.A);
+                    cycles += Compare_Reg_Imm(_registers.A);
                     instruction = "CP A, n";
                     break;
                 }
                 case 0xFF:
                 {
-                    cycles = Reset(0x38);
+                    cycles += Reset(0x38);
                     instruction = "RST 38H";
                     break;
                 }
                 default:
                 {
-                    cycles = 0;
+                    cycles += 0;
                     instruction = "Unknown Instruction";
                     break;
                 }
@@ -1473,7 +1473,7 @@ namespace Ceres80Emu.Emulator
                 }
                 default:
                 {
-                    cycles = 0;
+                    cycles += 0;
                     instruction = "Unknown Instruction";
                     break;
                 }
@@ -1496,7 +1496,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x00 and <= 0x07:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = RLC_Reg(ref GetReg(regCode));
+                    cycles += RLC_Reg(ref GetReg(regCode));
                     instruction = $"RLC {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1504,7 +1504,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x08 and <= 0x0F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = RRC_Reg(ref GetReg(regCode));
+                    cycles += RRC_Reg(ref GetReg(regCode));
                     instruction = $"RRC {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1512,7 +1512,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x10 and <= 0x17:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = RL_Reg(ref GetReg(regCode));
+                    cycles += RL_Reg(ref GetReg(regCode));
                     instruction = $"RL {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1520,7 +1520,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x18 and <= 0x1F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = RR_Reg(ref GetReg(regCode));
+                    cycles += RR_Reg(ref GetReg(regCode));
                     instruction = $"RR {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1528,7 +1528,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x20 and <= 0x27:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = SLA_Reg(ref GetReg(regCode));
+                    cycles += SLA_Reg(ref GetReg(regCode));
                     instruction = $"SLA {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1536,7 +1536,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x28 and <= 0x2F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = SRA_Reg(ref GetReg(regCode));
+                    cycles += SRA_Reg(ref GetReg(regCode));
                     instruction = $"SRA {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1544,7 +1544,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x30 and <= 0x37:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = SLA_Reg(ref GetReg(regCode));
+                    cycles += SLA_Reg(ref GetReg(regCode));
                     instruction = $"SLL {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1552,7 +1552,7 @@ namespace Ceres80Emu.Emulator
                 case >= 0x38 and <= 0x3F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles = SRL_Reg(ref GetReg(regCode));
+                    cycles += SRL_Reg(ref GetReg(regCode));
                     instruction = $"SRL {RegCodeToString(regCode)}";
                     break;
                 }
@@ -1564,12 +1564,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Bit_Reg16Ptr(bit, _registers.HL);
+                        cycles += Bit_Reg16Ptr(bit, _registers.HL);
                         instruction = $"BIT {bit}, (HL)";
                     }
                     else
                     {
-                        cycles = Bit_Reg(bit, ref GetReg(regCode));
+                        cycles += Bit_Reg(bit, ref GetReg(regCode));
                         instruction = $"BIT {bit}, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -1582,12 +1582,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Reset_Reg16Ptr(bit, _registers.HL);
+                        cycles += Reset_Reg16Ptr(bit, _registers.HL);
                         instruction = $"RES {bit}, (HL)";
                     }
                     else
                     {
-                        cycles = Reset_Reg(bit, ref GetReg(regCode));
+                        cycles += Reset_Reg(bit, ref GetReg(regCode));
                         instruction = $"RES {bit}, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -1600,12 +1600,12 @@ namespace Ceres80Emu.Emulator
 
                     if (regCode == 6) // (HL)
                     {
-                        cycles = Set_Reg16Ptr(bit, _registers.HL);
+                        cycles += Set_Reg16Ptr(bit, _registers.HL);
                         instruction = $"SET {bit}, (HL)";
                     }
                     else
                     {
-                        cycles = Set_Reg(bit, ref GetReg(regCode));
+                        cycles += Set_Reg(bit, ref GetReg(regCode));
                         instruction = $"SET {bit}, {RegCodeToString(regCode)}";
                     }
                     break;
@@ -1835,7 +1835,7 @@ namespace Ceres80Emu.Emulator
                 }
                 default:
                 {
-                    cycles = 0;
+                    cycles += 0;
                     instruction = "Unknown Instruction";
                     break;
                 }
@@ -1855,12 +1855,87 @@ namespace Ceres80Emu.Emulator
 
             switch (opcode)
             {
-                default:
+                case >= 0x00 and <= 0x07:
                 {
-                    cycles = 0;
-                    instruction = "Unknown Instruction";
+                    cycles += RLC_Index(_registers.IX);
+                    instruction = $"RLC (IX+d)";
                     break;
                 }
+
+                case >= 0x08 and <= 0x0F:
+                {
+                    cycles += RRC_Index(_registers.IX);
+                    instruction = $"RRC (IX+d)";
+                    break;
+                }
+
+                case >= 0x10 and <= 0x17:
+                {
+                    cycles += RL_Index(_registers.IX);
+                    instruction = $"RL (IX+d)";
+                    break;
+                }
+
+                case >= 0x18 and <= 0x1F:
+                {
+                    cycles += RR_Index(_registers.IX);
+                    instruction = $"RR (IX+d)";
+                    break;
+                }
+
+                case >= 0x20 and <= 0x27:
+                {
+                    cycles += SLA_Index(_registers.IX);
+                    instruction = $"SLA (IX+d)";
+                    break;
+                }
+
+                case >= 0x28 and <= 0x2F:
+                {
+                    cycles += SRA_Index(_registers.IX);
+                    instruction = $"SRA (IX+d)";
+                    break;
+                }
+
+                case >= 0x30 and <= 0x37:
+                {
+                    cycles += SLA_Index(_registers.IX);
+                    instruction = $"SLL (IX+d)";
+                    break;
+                }
+
+                case >= 0x38 and <= 0x3F:
+                {
+                    cycles += SRL_Index(_registers.IX);
+                    instruction = $"SRL (IX+d)";
+                    break;
+                }
+
+                case >= 0x40 and <= 0x7F:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    byte regCode = (byte)(opcode & 0b111);
+                    cycles += Bit_Index(bit, _registers.IX);
+                    instruction = $"BIT {bit}, (IX+d)";
+                    break;
+                }
+
+                case >= 0x80 and <= 0xBF:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    cycles += Reset_Index(bit, _registers.IX);
+                    instruction = $"RES {bit}, (IX+d)";
+                    break;
+                }
+
+                case >= 0xC0 and <= 0xFF:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    cycles += Set_Index(bit, _registers.IX);
+                    instruction = $"SET {bit}, (IX+d)"; 
+                    break;
+                }
+
             }
 
             return (cycles, instruction);
@@ -2086,7 +2161,7 @@ namespace Ceres80Emu.Emulator
                 }
                 default:
                 {
-                    cycles = 0;
+                    cycles += 0;
                     instruction = "Unknown Instruction";
                     break;
                 }
@@ -2106,10 +2181,84 @@ namespace Ceres80Emu.Emulator
 
             switch (opcode)
             {
-                default:
+                case >= 0x00 and <= 0x07:
                 {
-                    cycles = 0;
-                    instruction = "Unknown Instruction";
+                    cycles += RLC_Index(_registers.IY);
+                    instruction = $"RLC (IY+d)";
+                    break;
+                }
+
+                case >= 0x08 and <= 0x0F:
+                {
+                    cycles += RRC_Index(_registers.IY);
+                    instruction = $"RRC (IY+d)";
+                    break;
+                }
+
+                case >= 0x10 and <= 0x17:
+                {
+                    cycles += RL_Index(_registers.IY);
+                    instruction = $"RL (IY+d)";
+                    break;
+                }
+
+                case >= 0x18 and <= 0x1F:
+                {
+                    cycles += RR_Index(_registers.IY);
+                    instruction = $"RR (IY+d)";
+                    break;
+                }
+
+                case >= 0x20 and <= 0x27:
+                {
+                    cycles += SLA_Index(_registers.IY);
+                    instruction = $"SLA (IY+d)";
+                    break;
+                }
+
+                case >= 0x28 and <= 0x2F:
+                {
+                    cycles += SRA_Index(_registers.IY);
+                    instruction = $"SRA (IY+d)";
+                    break;
+                }
+
+                case >= 0x30 and <= 0x37:
+                {
+                    cycles += SLA_Index(_registers.IY);
+                    instruction = $"SLL (IY+d)";
+                    break;
+                }
+
+                case >= 0x38 and <= 0x3F:
+                {
+                    cycles += SRL_Index(_registers.IY);
+                    instruction = $"SRL (IY+d)";
+                    break;
+                }
+
+                case >= 0x40 and <= 0x7F:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    byte regCode = (byte)(opcode & 0b111);
+                    cycles += Bit_Index(bit, _registers.IY);
+                    instruction = $"BIT {bit}, (IY+d)";
+                    break;
+                }
+
+                case >= 0x80 and <= 0xBF:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    cycles += Reset_Index(bit, _registers.IY);
+                    instruction = $"RES {bit}, (IY+d)";
+                    break;
+                }
+
+                case >= 0xC0 and <= 0xFF:
+                {
+                    byte bit = (byte)((opcode & 0b00111000) >> 3);
+                    cycles += Set_Index(bit, _registers.IY);
+                    instruction = $"SET {bit}, (IY+d)";
                     break;
                 }
             }

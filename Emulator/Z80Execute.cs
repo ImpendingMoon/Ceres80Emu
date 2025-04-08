@@ -812,6 +812,15 @@ namespace Ceres80Emu.Emulator
             return 11;
         }
 
+        private int RLC_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RLC8(value));
+            return 15;
+        }
+
         /// <summary>
         /// Rotates a register right, bit 0 to carry and to bit 7
         /// <br/>Example: RRC A
@@ -831,6 +840,15 @@ namespace Ceres80Emu.Emulator
             byte value = _memoryBus.Read(address);
             _memoryBus.Write(address, RRC8(value));
             return 11;
+        }
+
+        private int RRC_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RRC8(value));
+            return 15;
         }
 
         /// <summary>
@@ -854,6 +872,15 @@ namespace Ceres80Emu.Emulator
             return 11;
         }
 
+        private int RL_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RL8(value));
+            return 15;
+        }
+
         /// <summary>
         /// Rotates a register right, bit 0 to carry and carry to bit 7
         /// <br/>Example: RR A
@@ -873,6 +900,15 @@ namespace Ceres80Emu.Emulator
             byte value = _memoryBus.Read(address);
             _memoryBus.Write(address, RR8(value));
             return 11;
+        }
+
+        private int RR_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, RR8(value));
+            return 15;
         }
 
         /// <summary>
@@ -896,6 +932,15 @@ namespace Ceres80Emu.Emulator
             return 11;
         }
 
+        private int SLA_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SLA8(value));
+            return 15;
+        }
+
         /// <summary>
         /// Shifts a register right, bit 0 to carry and bit 7 unchanged
         /// <br/>Example: SRA A
@@ -917,6 +962,15 @@ namespace Ceres80Emu.Emulator
             return 11;
         }
 
+        private int SRA_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SRA8(value));
+            return 15;
+        }
+
         /// <summary>
         /// Shifts a register right, bit 0 to carry and 0 to bit 7
         /// <br/>Example: SRL A
@@ -936,6 +990,15 @@ namespace Ceres80Emu.Emulator
             byte value = _memoryBus.Read(address);
             _memoryBus.Write(address, SRL8(value));
             return 11;
+        }
+
+        private int SRL_Index(ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, SRL8(value));
+            return 15;
         }
 
         /// <summary>
@@ -1007,6 +1070,15 @@ namespace Ceres80Emu.Emulator
             return 8;
         }
 
+        private int Bit_Index(byte bit, ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            Bit8(bit, value);
+            return 12;
+        }
+
         /// <summary>
         /// Sets a bit in a register
         /// <br/>Example: SET 0, B
@@ -1028,6 +1100,15 @@ namespace Ceres80Emu.Emulator
             return 8;
         }
 
+        private int Set_Index(byte bit, ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, Set8(bit, value));
+            return 12;
+        }
+
         /// <summary>
         /// Resets a bit in a register
         /// <br/>Example: RES 0, B
@@ -1047,6 +1128,15 @@ namespace Ceres80Emu.Emulator
             byte value = _memoryBus.Read(address);
             _memoryBus.Write(address, Reset8(bit, value));
             return 8;
+        }
+
+        private int Reset_Index(byte bit, ushort index)
+        {
+            byte offset = ReadImm();
+            ushort address = (ushort)(index + offset);
+            byte value = _memoryBus.Read(address);
+            _memoryBus.Write(address, Reset8(bit, value));
+            return 12;
         }
 
 
