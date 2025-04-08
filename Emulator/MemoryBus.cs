@@ -8,7 +8,14 @@ namespace Ceres80Emu.Emulator
 {
     internal class MemoryBus
     {
-        public MemoryBus() { }
+        public MemoryBus(Memory rom, Memory ram, LCD lcd, CTC ctc, PIO pio)
+        {
+            _rom = rom;
+            _ram = ram;
+            _lcd = lcd;
+            _ctc = ctc;
+            _pio = pio;
+        }
 
         /// <summary>
         /// Reads a byte from the memory bus.
@@ -21,6 +28,15 @@ namespace Ceres80Emu.Emulator
         {
             if(port)
             {
+                switch(address & 0xFF)
+                {
+                    case <= 0x03:
+                        return _ctc.Read(address);
+                    case <= 0x07:
+                        return _pio.Read(address);
+                    case <= 0x0B:
+                        return _lcd.Read(address);
+                }
                 return 0x00; // Open bus
             }
 
@@ -41,10 +57,20 @@ namespace Ceres80Emu.Emulator
         {
             if(port)
             {
-                return;
+                switch(address & 0xFF)
+                {
+                    case <= 0x03:
+                        _ctc.Write(address, data);
+                        break;
+                    case <= 0x07:
+                        _pio.Write(address, data);
+                        break;
+                    case <= 0x0B:
+                        _lcd.Write(address, data);
+                        break;
+                }
             }
-
-            if (address <= 0x7FFF)
+            else if (address <= 0x7FFF)
             {
                 _rom.Write(address, data);
             }
@@ -54,8 +80,12 @@ namespace Ceres80Emu.Emulator
             }
         }
 
-        // Could use dependency injection, but memory map will never change
-        private Memory _rom = new Memory(32768, false);
-        private Memory _ram = new Memory(32768, true);
+        // For a more extensive memory bus, we could add a list of devices and check if the address is in the range of any device.
+        // But the Ceres80 is simple and stable, so this is simpler and faster.
+        private Memory _rom;
+        private Memory _ram;
+        private LCD _lcd;
+        private CTC _ctc;
+        private PIO _pio;
     }
 }

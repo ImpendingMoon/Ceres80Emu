@@ -6,20 +6,23 @@ using System.Threading.Tasks;
 
 namespace Ceres80Emu.Emulator
 {
-    internal class LCD: IMemoryDevice
+    internal class PIO : IMemoryDevice
     {
         public ushort Size { get; } = 4;
+
         public bool CanWrite { get; } = true;
+
         public bool CanRead { get; } = true;
 
         public byte Read(ushort address)
         {
-            return 0x00;
+            return 0;
         }
 
         public void Write(ushort address, byte data)
         {
         }
+
 
         public byte[] SaveState()
         {

@@ -26,6 +26,11 @@ namespace Ceres80Emu.Emulator
             return _interruptLine;
         }
 
+        public bool IsAcknowledgePending()
+        {
+            return _acknowledgeLine;
+        }
+
         private bool _interruptLine = false;
         private bool _acknowledgeLine = false;
     }
