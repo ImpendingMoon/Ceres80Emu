@@ -117,7 +117,7 @@ namespace Ceres80Emu.Emulator
             return new byte[0];
         }
 
-        public void LoadState()
+        public void LoadState(byte[] data)
         {
 
         }
