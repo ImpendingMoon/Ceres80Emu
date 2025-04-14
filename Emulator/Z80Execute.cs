@@ -93,9 +93,10 @@ namespace Ceres80Emu.Emulator
         /// Stores a register into the memory location pointed to by an immediate value
         /// <br/>Example: LD (nn), A
         /// </summary>
-        private int Load_ImmPtr_Reg(ushort dest, byte src)
+        private int Load_ImmPtr_Reg(byte src)
         {
-            _memoryBus.Write(dest, src);
+            ushort address = ReadImm16();
+            _memoryBus.Write(address, src);
             return 13;
         }
 

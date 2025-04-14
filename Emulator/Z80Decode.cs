@@ -340,7 +340,7 @@ namespace Ceres80Emu.Emulator
                 }
                 case 0x32:
                 {
-                    cycles += Load_ImmPtr_Reg(_registers.HL, _registers.A);
+                    cycles += Load_ImmPtr_Reg(_registers.A);
                     instruction = "LD (nn), A";
                     break;
                 }
@@ -1303,7 +1303,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xB1:
@@ -1315,7 +1318,11 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
+                        
                     break;
                 }
                 case 0xB2:
@@ -1327,7 +1334,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xB3:
@@ -1339,7 +1349,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xB8:
@@ -1351,7 +1364,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xB9:
@@ -1363,7 +1379,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xBA:
@@ -1375,7 +1394,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 case 0xBB:
@@ -1387,7 +1409,10 @@ namespace Ceres80Emu.Emulator
                         _runningRepeatInstruction = true;
                         cycles += 5;
                     }
-                    _runningRepeatInstruction = false;
+                    else
+                    {
+                        _runningRepeatInstruction = false;
+                    }
                     break;
                 }
                 default:
