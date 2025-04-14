@@ -23,15 +23,21 @@ namespace Ceres80Emu.Emulator
         {
         }
 
+        public void Reset()
+        {
+        }
+
+        public void Tick()
+        {
+        }
 
         public byte[] SaveState()
         {
-            throw new NotImplementedException();
+            return new byte[0];
         }
 
-        public void LoadState(byte[] data)
+        public void LoadState(byte[] state)
         {
-            throw new NotImplementedException();
         }
     }
 }

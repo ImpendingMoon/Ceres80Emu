@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Ceres80Emu.Emulator
 {
-    // NOTE: This does not handle chained interrupts.
     internal class CTC : IMemoryDevice
     {
         public CTC(InterruptManager interruptManager)
@@ -34,6 +33,14 @@ namespace Ceres80Emu.Emulator
             _channels[channel].Write(data);
         }
 
+        public void Reset()
+        {
+            foreach (var channel in _channels)
+            {
+                channel.Reset();
+            }
+        }
+
         public void Tick()
         {
             foreach (var channel in _channels)
@@ -44,12 +51,24 @@ namespace Ceres80Emu.Emulator
 
         public byte[] SaveState()
         {
-            throw new NotImplementedException();
+            List<byte> state = new List<byte>();
+            foreach (var channel in _channels)
+            {
+                state.AddRange(channel.SaveState());
+            }
+            return state.ToArray();
         }
 
-        public void LoadState(byte[] data)
+        public void LoadState(byte[] state)
         {
-            throw new NotImplementedException();
+            int offset = 0;
+            foreach (var channel in _channels)
+            {
+                byte[] channelState = new byte[channel.SaveState().Length];
+                Array.Copy(state, offset, channelState, 0, channelState.Length);
+                channel.LoadState(channelState);
+                offset += channelState.Length;
+            }
         }
 
         private readonly CTCChannel[] _channels;

@@ -91,6 +91,36 @@ namespace Ceres80Emu.Emulator
             _waitingForTimeConstant = false;
         }
 
+        public byte[] SaveState()
+        {
+            List<byte> state = new List<byte>
+            {
+                _prescaler,
+                _counter,
+                _internalCounter,
+                _timeConstant,
+                (byte)(_running ? 1 : 0),
+                (byte)(_interruptEnabled ? 1 : 0),
+                (byte)(_waitingForInterrupt ? 1 : 0),
+                (byte)(_waitingForTimeConstant ? 1 : 0)
+            };
+            return state.ToArray();
+        }
+
+        public void LoadState(byte[] state)
+        {
+            if (state.Length != 8)
+                throw new ArgumentException("Invalid state length.");
+            _prescaler = state[0];
+            _counter = state[1];
+            _internalCounter = state[2];
+            _timeConstant = state[3];
+            _running = state[4] != 0;
+            _interruptEnabled = state[5] != 0;
+            _waitingForInterrupt = state[6] != 0;
+            _waitingForTimeConstant = state[7] != 0;
+        }
+
         private byte _prescaler = 16;
         private byte _counter = 0x00;
         private byte _internalCounter = 16;

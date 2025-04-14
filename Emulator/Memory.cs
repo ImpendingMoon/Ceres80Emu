@@ -35,6 +35,15 @@ namespace Ceres80Emu.Emulator
             }
         }
 
+        public void Reset()
+        {
+            Array.Clear(_data, 0, Size);
+        }
+
+        public void Tick()
+        {
+        }
+
         public void LoadState(byte[] data)
         {
             Array.Copy(data, _data, Math.Min(Size, data.Length));
