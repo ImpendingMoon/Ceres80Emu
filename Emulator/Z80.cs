@@ -60,6 +60,9 @@ namespace Ceres80Emu.Emulator
             {
                 field.SetValue(_registers, 0);
             }
+            _halted = false;
+            _justEnabledInterrupts = false;
+            _runningRepeatInstruction = false;
         }
 
 
