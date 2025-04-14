@@ -37,27 +37,27 @@ namespace Ceres80Emu.Emulator
                 // Handle opcode prefixes
                 case 0xCB:
                 {
-                    (cycles, instruction) = DecodeBit();
+                    (cycles, instruction) = DecodeBit(opcode);
                     break;
                 }
                 case 0xDD:
                 {
-                    (cycles, instruction) = DecodeIX();
+                    (cycles, instruction) = DecodeIX(opcode);
                     break;
                 }
                 case 0xED:
                 {
-                    (cycles, instruction) = DecodeMisc();
+                    (cycles, instruction) = DecodeMisc(opcode);
                     break;
                 }
                 case 0xFD:
                 {
-                    (cycles, instruction) = DecodeIY();
+                    (cycles, instruction) = DecodeIY(opcode);
                     break;
                 }
                 default:
                 {
-                    (cycles, instruction) = DecodeMain();
+                    (cycles, instruction) = DecodeMain(opcode);
                     break;
                 }
             }
@@ -84,11 +84,10 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeMain()
+        private (int, string) DecodeMain(byte opcode)
         {
             int cycles = 0;
             string instruction = "";
-            int opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1062,12 +1061,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeMisc()
+        private (int, string) DecodeMisc(byte opcode)
         {
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1484,12 +1483,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeBit()
+        private (int, string) DecodeBit(byte opcode)
         {
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1617,12 +1616,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeIX()
+        private (int, string) DecodeIX(byte opcode)
         {
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1800,7 +1799,7 @@ namespace Ceres80Emu.Emulator
                 }
                 case 0xCB:
                 {
-                    (cycles, instruction) = DecodeIXBit();
+                    (cycles, instruction) = DecodeIXBit(opcode);
                     break;
                 }
                 case 0xE1:
@@ -1846,12 +1845,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeIXBit()
+        private (int, string) DecodeIXBit(byte opcode)
         {
             // Took 8 cycles to read first two bytes of opcode
             int cycles = 8;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -1943,12 +1942,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeIY()
+        private (int, string) DecodeIY(byte opcode)
         {
             // Took 4 cycles to read first byte of opcode
             int cycles = 4;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
@@ -2126,7 +2125,7 @@ namespace Ceres80Emu.Emulator
                 }
                 case 0xCB:
                 {
-                    (cycles, instruction) = DecodeIYBit();
+                    (cycles, instruction) = DecodeIYBit(opcode);
                     break;
                 }
                 case 0xE1:
@@ -2172,12 +2171,12 @@ namespace Ceres80Emu.Emulator
 
 
 
-        private (int, string) DecodeIYBit()
+        private (int, string) DecodeIYBit(byte opcode)
         {
             // Took 8 cycles to read first two bytes of opcode
             int cycles = 8;
             string instruction = "";
-            int opcode = FetchInstruction();
+            opcode = FetchInstruction();
 
             switch (opcode)
             {
