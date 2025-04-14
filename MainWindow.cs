@@ -19,7 +19,20 @@ namespace Ceres80Emu
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
             openFileDialog.Multiselect = false;
-            openFileDialog.ShowDialog();
+            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+                byte[] romData = File.ReadAllBytes(filePath);
+                Ceres80.LoadROM(romData);
+                Ceres80.Start();
+            }
         }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            Ceres80 = new Emulator.Ceres80();
+        }
+
+        private Emulator.Ceres80 Ceres80;
     }
 }

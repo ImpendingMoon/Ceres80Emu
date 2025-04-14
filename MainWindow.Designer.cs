@@ -84,6 +84,7 @@
             MainMenuStrip = menuStrip1;
             Name = "MainWindow";
             Text = "Ceres80Emu";
+            Load += MainWindow_Load;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxInterpolationMode1).EndInit();
