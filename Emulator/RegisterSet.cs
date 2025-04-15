@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ceres80Emu.Emulator
+﻿namespace Ceres80Emu.Emulator
 {
     internal class RegisterSet
     {
+        public void Reset()
+        {
+            AF = BC = DE = BC = DE = HL = 0;
+            AltAF = AltBC = AltDE = AltHL = 0;
+            IX = IY = SP = PC = 0;
+            I = R = 0;
+            IFF1 = IFF2 = false;
+        }
+
         // General purpose registers and alternate registers
         public byte A, F, B, C, D, E, H, L;
         public byte AltA, AltF, AltB, AltC, AltD, AltE, AltH, AltL;
