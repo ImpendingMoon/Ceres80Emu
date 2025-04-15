@@ -111,13 +111,14 @@ namespace Ceres80Emu.Emulator
         public Ceres80()
         {
             // Initialization order matters. Do not change.
+            _debugManager = new DebugManager();
             _interruptManager = new InterruptManager();
             _rom = new Memory(32768, false);
             _ram = new Memory(32768, true);
-            _ctc = new CTC(_interruptManager);
+            _ctc = new CTC(_interruptManager, _debugManager);
             _pio = new PIO();
             _lcd = new LCD();
-            _bus = new MemoryBus();
+            _bus = new MemoryBus(_debugManager);
 
             _bus.AddMemoryDevice(_rom, 0x0000, 0x7FFF);
             _bus.AddMemoryDevice(_ram, 0x8000, 0xFFFF);
@@ -125,7 +126,7 @@ namespace Ceres80Emu.Emulator
             _bus.AddPortDevice(_pio, 0x0004, 0x0007);
             _bus.AddPortDevice(_lcd, 0x0008, 0x000B);
 
-            _cpu = new Z80(_bus, _interruptManager);
+            _cpu = new Z80(_bus, _interruptManager, _debugManager);
 
         }
 
@@ -148,6 +149,7 @@ namespace Ceres80Emu.Emulator
             int cyclesElapsed = 0;
             while (cyclesElapsed < cycles)
             {
+                _debugManager.StartInstruction();
                 int currentCycles = _cpu.Tick();
                 for (int i = 0; i < currentCycles; i++)
                 {
@@ -156,6 +158,7 @@ namespace Ceres80Emu.Emulator
                     _lcd.Tick();
                 }
                 cyclesElapsed += currentCycles;
+                _debugManager.StopInstruction();
             }
         }
 
@@ -179,6 +182,7 @@ namespace Ceres80Emu.Emulator
 
         private Z80 _cpu;
         private MemoryBus _bus;
+        private DebugManager _debugManager;
         private InterruptManager _interruptManager;
         private Memory _rom;
         private Memory _ram;

@@ -8,10 +8,11 @@ namespace Ceres80Emu.Emulator
 {
     internal partial class Z80
     {
-        public Z80(MemoryBus memoryBus, InterruptManager interruptManager)
+        public Z80(MemoryBus memoryBus, InterruptManager interruptManager, DebugManager debugManager)
         {
             _memoryBus = memoryBus;
             _interruptManager = interruptManager;
+            _debugManager = debugManager;
             _registers = new RegisterSet();
         }
 
@@ -31,11 +32,19 @@ namespace Ceres80Emu.Emulator
                 _interruptManager.AcknowledgeLine = true;
                 _interruptManager.InterruptLine = false;
                 _registers.IFF1 = false;
+                _debugManager.AddInterrupt(false);
                 return 13;
+            }
+
+            // Handle EI instruction delay
+            if (_justEnabledInterrupts)
+            {
+                _justEnabledInterrupts = false;
             }
 
             if (_halted)
             {
+                _debugManager.AddHalted();
                 return 4;
             }
 
@@ -75,12 +84,6 @@ namespace Ceres80Emu.Emulator
                 }
             }
 
-            // Handle EI instruction delay
-            if (_justEnabledInterrupts)
-            {
-                _justEnabledInterrupts = false;
-            }
-
             // Memory Refresh Register (7-bit)
             if (_registers.R == 127)
             {
@@ -90,6 +93,8 @@ namespace Ceres80Emu.Emulator
 
             // Repeaat instructions (LDIR, LDDR, etc.) stay on the same instruction until BC is 0
             if (_runningRepeatInstruction) { _registers.PC = startAddress; }
+
+            _debugManager.AddInstruction(instruction, startAddress, cycles);
 
             return cycles;
         }
@@ -105,6 +110,8 @@ namespace Ceres80Emu.Emulator
         private MemoryBus _memoryBus;
         private InterruptManager _interruptManager;
         private RegisterSet _registers;
+        private DebugManager _debugManager;
+
         private bool _halted = false;
         // EI instruction is delayed by one instruction for returning from an isr
         private bool _justEnabledInterrupts = false;

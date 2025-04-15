@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ceres80Emu.Emulator
+﻿namespace Ceres80Emu.Emulator
 {
     internal class CTC : IMemoryDevice
     {
-        public CTC(InterruptManager interruptManager)
+        public CTC(InterruptManager interruptManager, DebugManager debugManager)
         {
             _channels = new CTCChannel[4];
             for (int i = 0; i < 4; i++)
             {
-                _channels[i] = new CTCChannel(interruptManager);
+                _channels[i] = new CTCChannel(interruptManager, debugManager);
             }
         }
 

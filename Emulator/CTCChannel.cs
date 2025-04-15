@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ceres80Emu.Emulator
+﻿namespace Ceres80Emu.Emulator
 {
     internal class CTCChannel
     {
-        public CTCChannel(InterruptManager interruptManager)
+        public CTCChannel(InterruptManager interruptManager, DebugManager debugManager)
         {
             _interruptManager = interruptManager;
+            _debugManager = debugManager;
         }
 
         public byte Read()
@@ -54,9 +48,10 @@ namespace Ceres80Emu.Emulator
 
         public void Tick()
         {
-            if (_waitingForInterrupt && _interruptManager.IsAcknowledgePending())
+            if (_waitingForInterrupt && _interruptManager.AcknowledgeLine)
             {
                 _waitingForInterrupt = false;
+                _interruptManager.AcknowledgeLine = false;
             }
 
             if (!_running || _waitingForInterrupt)
@@ -72,8 +67,9 @@ namespace Ceres80Emu.Emulator
                     _counter = _timeConstant;
                     if (_interruptEnabled)
                     {
-                        _interruptManager.RaiseInterrupt();
+                        _interruptManager.InterruptLine = true;
                         _waitingForInterrupt = true;
+                        _debugManager.AddInterrupt(true);
                     }
                 }
             }
@@ -131,5 +127,6 @@ namespace Ceres80Emu.Emulator
         private bool _waitingForTimeConstant = false;
 
         private InterruptManager _interruptManager;
+        private DebugManager _debugManager;
     }
 }
