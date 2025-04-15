@@ -108,6 +108,14 @@ namespace Ceres80Emu.Emulator
             }
         }
 
+        public Bitmap GetBitmap()
+        {
+            lock (_lock)
+            {
+                return _lcd.GetBitmap();
+            }
+        }
+
         public Ceres80()
         {
             // Initialization order matters. Do not change.
