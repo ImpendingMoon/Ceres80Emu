@@ -26,7 +26,7 @@ namespace Ceres80Emu.Emulator
             if (device == null)
                 value = 0xFF; // Open bus
             else 
-                value = device.Device.Read(address);
+                value = device.Device.Read((ushort)(address - device.StartAddress));
 
             _debugManager.AddMemoryAccess(address, value, true, accessType);
 
@@ -40,7 +40,7 @@ namespace Ceres80Emu.Emulator
             if (device == null)
                 value = 0xFF; // Open bus
             else
-                value = device.Device.Read(port);
+                value = device.Device.Read((byte)(port - device.StartAddress));
 
             _debugManager.AddPortAccess(port, value, true);
 
@@ -54,7 +54,7 @@ namespace Ceres80Emu.Emulator
             var device = _memoryDevices.FirstOrDefault(d => d.Contains(address));
             if (device == null)
                 return; // Open bus
-            device.Device.Write(address, data);
+            device.Device.Write((ushort)(address - device.StartAddress), data);
         }
 
         public void WritePort(byte port, byte data)
@@ -64,7 +64,7 @@ namespace Ceres80Emu.Emulator
             var device = _portDevices.FirstOrDefault(d => d.Contains(port));
             if (device == null)
                 return; // Open bus
-            device.Device.Write(port, data);
+            device.Device.Write((byte)(port - device.StartAddress), data);
         }
 
         private List<DeviceMapping> _memoryDevices = new();
