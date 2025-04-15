@@ -65,7 +65,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Load_Reg16Ptr_Reg(ushort dest, byte src)
         {
-            _memoryBus.Write(dest, src);
+            _memoryBus.WriteMemory(dest, src);
             return 7;
         }
 
@@ -75,7 +75,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Load_Reg_Reg16Ptr(ref byte dest, ushort src)
         {
-            dest = _memoryBus.Read(src);
+            dest = _memoryBus.ReadMemory(src);
             return 7;
         }
 
@@ -85,7 +85,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Load_Reg16Ptr_Imm(ushort dest)
         {
-            _memoryBus.Write(dest, ReadImm());
+            _memoryBus.WriteMemory(dest, ReadImm());
             return 10;
         }
 
@@ -96,7 +96,7 @@ namespace Ceres80Emu.Emulator
         private int Load_ImmPtr_Reg(byte src)
         {
             ushort address = ReadImm16();
-            _memoryBus.Write(address, src);
+            _memoryBus.WriteMemory(address, src);
             return 13;
         }
 
@@ -119,7 +119,7 @@ namespace Ceres80Emu.Emulator
         {
             int offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            _memoryBus.Write(address, src);
+            _memoryBus.WriteMemory(address, src);
             return 15;
         }
 
@@ -132,7 +132,7 @@ namespace Ceres80Emu.Emulator
             byte offset = ReadImm();
             byte value = ReadImm();
             ushort address = (ushort)(index + offset);
-            _memoryBus.Write(address, value);
+            _memoryBus.WriteMemory(address, value);
             return 15;
         }
 
@@ -144,7 +144,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = _memoryBus.Read(address);
+            dest = _memoryBus.ReadMemory(address);
             return 15;
         }
 
@@ -200,7 +200,7 @@ namespace Ceres80Emu.Emulator
         private int Push_Reg16(ushort reg)
         {
             _registers.SP -= 2;
-            WriteShort(_registers.SP, reg);
+            WriteShort(_registers.SP, reg, MemoryAccessType.Stack);
             return 11;
         }
 
@@ -263,7 +263,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Compare_Increment()
         {
-            byte value = _memoryBus.Read(_registers.HL);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
             byte result = (byte)(_registers.A - value);
             _registers.HL++;
             _registers.BC--;
@@ -283,7 +283,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Compare_Decrement()
         {
-            byte value = _memoryBus.Read(_registers.HL);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
             byte result = (byte)(_registers.A - value);
             _registers.HL--;
             _registers.BC--;
@@ -327,7 +327,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Add_Reg_Reg16Ptr(ref byte dest, ushort src, bool carry = false)
         {
-            dest = Add8(dest, _memoryBus.Read(src), carry);
+            dest = Add8(dest, _memoryBus.ReadMemory(src), carry);
             return 7;
         }
 
@@ -339,7 +339,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = Add8(dest, _memoryBus.Read(address), carry);
+            dest = Add8(dest, _memoryBus.ReadMemory(address), carry);
             return 15;
         }
 
@@ -383,8 +383,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Inc_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Add8(value, 1, false, false));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Add8(value, 1, false, false));
             return 11;
         }
 
@@ -406,8 +406,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Add8(value, 1, false, false));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Add8(value, 1, false, false));
 
             return 19;
         }
@@ -438,7 +438,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Sub_Reg_Reg16Ptr(ref byte dest, ushort src, bool carry = false)
         {
-            dest = Sub8(dest, _memoryBus.Read(src), carry);
+            dest = Sub8(dest, _memoryBus.ReadMemory(src), carry);
             return 7;
         }
 
@@ -450,7 +450,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = Sub8(dest, _memoryBus.Read(address), carry);
+            dest = Sub8(dest, _memoryBus.ReadMemory(address), carry);
             return 15;
         }
 
@@ -490,8 +490,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Dec_Reg16Ptr(ushort addressess)
         {
-            byte value = _memoryBus.Read(addressess);
-            _memoryBus.Write(addressess, Sub8(value, 1, false, false));
+            byte value = _memoryBus.ReadMemory(addressess);
+            _memoryBus.WriteMemory(addressess, Sub8(value, 1, false, false));
             return 11;
         }
 
@@ -513,8 +513,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Sub8(value, 1, false, false));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Sub8(value, 1, false, false));
 
             return 19;
         }
@@ -545,7 +545,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Compare_Reg_Reg16Ptr(byte dest, ushort src)
         {
-            Sub8(dest, _memoryBus.Read(src), false);
+            Sub8(dest, _memoryBus.ReadMemory(src), false);
             return 7;
         }
 
@@ -557,7 +557,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            Sub8(dest, _memoryBus.Read(address), false);
+            Sub8(dest, _memoryBus.ReadMemory(address), false);
             return 15;
         }
 
@@ -587,7 +587,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int And_Reg_Reg16Ptr(ref byte dest, ushort src)
         {
-            dest = And8(dest, _memoryBus.Read(src));
+            dest = And8(dest, _memoryBus.ReadMemory(src));
             return 7;
         }
 
@@ -599,7 +599,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = And8(dest, _memoryBus.Read(address));
+            dest = And8(dest, _memoryBus.ReadMemory(address));
             return 15;
         }
 
@@ -629,7 +629,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Or_Reg_Reg16Ptr(ref byte dest, ushort src)
         {
-            dest = Or8(dest, _memoryBus.Read(src));
+            dest = Or8(dest, _memoryBus.ReadMemory(src));
             return 7;
         }
 
@@ -641,7 +641,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = Or8(dest, _memoryBus.Read(address));
+            dest = Or8(dest, _memoryBus.ReadMemory(address));
             return 15;
         }
 
@@ -671,7 +671,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Xor_Reg_Reg16Ptr(ref byte dest, ushort src)
         {
-            dest = Xor8(dest, _memoryBus.Read(src));
+            dest = Xor8(dest, _memoryBus.ReadMemory(src));
             return 7;
         }
 
@@ -683,7 +683,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            dest = Xor8(dest, _memoryBus.Read(address));
+            dest = Xor8(dest, _memoryBus.ReadMemory(address));
             return 15;
         }
 
@@ -808,8 +808,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RLC_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RLC8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RLC8(value));
             return 11;
         }
 
@@ -817,8 +817,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RLC8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RLC8(value));
             return 15;
         }
 
@@ -838,8 +838,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RRC_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RRC8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RRC8(value));
             return 11;
         }
 
@@ -847,8 +847,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RRC8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RRC8(value));
             return 15;
         }
 
@@ -868,8 +868,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RL_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RL8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RL8(value));
             return 11;
         }
 
@@ -877,8 +877,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RL8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RL8(value));
             return 15;
         }
 
@@ -898,8 +898,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RR_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RR8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RR8(value));
             return 11;
         }
 
@@ -907,8 +907,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, RR8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, RR8(value));
             return 15;
         }
 
@@ -928,8 +928,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int SLA_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SLA8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SLA8(value));
             return 11;
         }
 
@@ -937,8 +937,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SLA8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SLA8(value));
             return 15;
         }
 
@@ -958,8 +958,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int SRA_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SRA8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SRA8(value));
             return 11;
         }
 
@@ -967,8 +967,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SRA8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SRA8(value));
             return 15;
         }
 
@@ -988,8 +988,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int SRL_Reg16Ptr(ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SRL8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SRL8(value));
             return 11;
         }
 
@@ -997,8 +997,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, SRL8(value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, SRL8(value));
             return 15;
         }
 
@@ -1008,13 +1008,13 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RRD()
         {
-            byte value = _memoryBus.Read(_registers.HL);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
             byte lowNibble = (byte)(_registers.A & 0x0F);
             byte highNibble = (byte)(value & 0x0F);
             _registers.A = (byte)((_registers.A & 0xF0) | (value >> 4));
             value = (byte)((value << 4) | lowNibble);
 
-            _memoryBus.Write(_registers.HL, value);
+            _memoryBus.WriteMemory(_registers.HL, value);
             _registers.HalfCarry = false;
             _registers.Subtract = false;
             _registers.Zero = _registers.A == 0;
@@ -1030,13 +1030,13 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int RLD()
         {
-            byte value = _memoryBus.Read(_registers.HL);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
             byte lowNibble = (byte)(_registers.A & 0x0F);
             byte highNibble = (byte)(value >> 4);
             _registers.A = (byte)((_registers.A & 0xF0) | highNibble);
             value = (byte)((value << 4) | lowNibble);
 
-            _memoryBus.Write(_registers.HL, value);
+            _memoryBus.WriteMemory(_registers.HL, value);
             _registers.HalfCarry = false;
             _registers.Subtract = false;
             _registers.Zero = _registers.A == 0;
@@ -1066,7 +1066,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Bit_Reg16Ptr(byte bit, ushort address)
         {
-            byte value = _memoryBus.Read(address);
+            byte value = _memoryBus.ReadMemory(address);
             Bit8(bit, value);
             return 8;
         }
@@ -1075,7 +1075,7 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
+            byte value = _memoryBus.ReadMemory(address);
             Bit8(bit, value);
             return 12;
         }
@@ -1096,8 +1096,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Set_Reg16Ptr(byte bit, ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Set8(bit, value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Set8(bit, value));
             return 8;
         }
 
@@ -1105,8 +1105,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Set8(bit, value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Set8(bit, value));
             return 12;
         }
 
@@ -1126,8 +1126,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Reset_Reg16Ptr(byte bit, ushort address)
         {
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Reset8(bit, value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Reset8(bit, value));
             return 8;
         }
 
@@ -1135,8 +1135,8 @@ namespace Ceres80Emu.Emulator
         {
             byte offset = ReadImm();
             ushort address = (ushort)(index + offset);
-            byte value = _memoryBus.Read(address);
-            _memoryBus.Write(address, Reset8(bit, value));
+            byte value = _memoryBus.ReadMemory(address);
+            _memoryBus.WriteMemory(address, Reset8(bit, value));
             return 12;
         }
 
@@ -1208,7 +1208,7 @@ namespace Ceres80Emu.Emulator
             if (condition)
             {
                 _registers.SP -= 2;
-                WriteShort(_registers.SP, _registers.PC);
+                WriteShort(_registers.SP, _registers.PC, MemoryAccessType.Stack);
                 _registers.PC = address;
                 return 17;
             }
@@ -1222,7 +1222,7 @@ namespace Ceres80Emu.Emulator
         private int Reset(byte address)
         {
             _registers.SP -= 2;
-            WriteShort(_registers.SP, _registers.PC);
+            WriteShort(_registers.SP, _registers.PC, MemoryAccessType.Stack);
             _registers.PC = address;
             return 11;
         }
@@ -1236,7 +1236,7 @@ namespace Ceres80Emu.Emulator
             // RET without a condition is faster than RET cc
             if (condition == null)
             {
-                _registers.PC = ReadShort(_registers.SP);
+                _registers.PC = ReadShort(_registers.SP, MemoryAccessType.Stack);
                 _registers.SP += 2;
                 return 10;
             }
@@ -1256,7 +1256,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Return_From_Interrupt()
         {
-            _registers.PC = ReadShort(_registers.SP);
+            _registers.PC = ReadShort(_registers.SP, MemoryAccessType.Stack);
             _registers.SP += 2;
             return 10;
         }
@@ -1267,7 +1267,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Return_From_Nonmaskable_Interrupt()
         {
-            _registers.PC = ReadShort(_registers.SP);
+            _registers.PC = ReadShort(_registers.SP, MemoryAccessType.Stack);
             _registers.SP += 2;
             _registers.IFF1 = _registers.IFF2;
             return 10;
@@ -1283,7 +1283,7 @@ namespace Ceres80Emu.Emulator
         private int In_Reg(ref byte reg)
         {
             byte port = ReadImm();
-            reg = _memoryBus.Read((ushort)(port), true);
+            reg = _memoryBus.ReadPort(port);
             return 11;
         }
 
@@ -1294,7 +1294,7 @@ namespace Ceres80Emu.Emulator
         private int Out_Reg(byte reg)
         {
             byte port = ReadImm();
-            _memoryBus.Write((ushort)(port), reg, true);
+            _memoryBus.WritePort(port, reg);
             return 11;
         }
 
@@ -1304,7 +1304,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int In_C_Reg(ref byte reg)
         {
-            reg = _memoryBus.Read(_registers.C, true);
+            reg = _memoryBus.ReadPort(_registers.C);
             return 8;
         }
 
@@ -1314,7 +1314,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Out_C_Reg(byte reg)
         {
-            _memoryBus.Write(_registers.C, reg, true);
+            _memoryBus.WritePort(_registers.C, reg);
             return 8;
         }
 
@@ -1325,8 +1325,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int In_Increment()
         {
-            byte value = _memoryBus.Read(_registers.C, true);
-            _memoryBus.Write(_registers.HL, value);
+            byte value = _memoryBus.ReadPort(_registers.C);
+            _memoryBus.WriteMemory(_registers.HL, value);
             _registers.HL++;
             _registers.B--;
 
@@ -1343,8 +1343,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int In_Decrement()
         {
-            byte value = _memoryBus.Read(_registers.C, true);
-            _memoryBus.Write(_registers.HL, value);
+            byte value = _memoryBus.ReadPort(_registers.C);
+            _memoryBus.WriteMemory(_registers.HL, value);
             _registers.HL--;
             _registers.B--;
 
@@ -1362,8 +1362,8 @@ namespace Ceres80Emu.Emulator
         private int Out_Increment()
         {
             _registers.B--;
-            byte value = _memoryBus.Read(_registers.HL);
-            _memoryBus.Write(_registers.C, value, true);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
+            _memoryBus.WritePort(_registers.C, value);
             _registers.HL++;
 
             _registers.Subtract = true;
@@ -1380,8 +1380,8 @@ namespace Ceres80Emu.Emulator
         private int Out_Decrement()
         {
             _registers.B--;
-            byte value = _memoryBus.Read(_registers.HL);
-            _memoryBus.Write(_registers.C, value, true);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
+            _memoryBus.WritePort(_registers.C, value);
             _registers.HL--;
 
             _registers.Subtract = true;
@@ -1437,31 +1437,31 @@ namespace Ceres80Emu.Emulator
         }
 
         /************************** Internal Helpers *************************/
-        private ushort ReadShort(ushort address)
+        private ushort ReadShort(ushort address, MemoryAccessType accessType = MemoryAccessType.Standard)
         {
-            byte low = _memoryBus.Read(address);
-            byte high = _memoryBus.Read((ushort)(address + 1));
+            byte low = _memoryBus.ReadMemory(address, accessType);
+            byte high = _memoryBus.ReadMemory((ushort)(address + 1), accessType);
             return (ushort)((high << 8) | low);
         }
 
-        private void WriteShort(ushort address, ushort data)
+        private void WriteShort(ushort address, ushort data, MemoryAccessType accessType = MemoryAccessType.Standard)
         {
             byte low = (byte)data;
             byte high = (byte)(data >> 8);
-            _memoryBus.Write(address, low);
-            _memoryBus.Write((ushort)(address + 1), high);
+            _memoryBus.WriteMemory(address, low, accessType);
+            _memoryBus.WriteMemory((ushort)(address + 1), high, accessType);
         }
 
         private byte ReadImm()
         {
-            byte value = _memoryBus.Read((ushort)(_registers.PC));
+            byte value = _memoryBus.ReadMemory(_registers.PC, MemoryAccessType.Immediate);
             _registers.PC += 1;
             return value;
         }
 
         private ushort ReadImm16()
         {
-            ushort value = ReadShort((ushort)(_registers.PC));
+            ushort value = ReadShort(_registers.PC, MemoryAccessType.Immediate);
             _registers.PC += 2;
             return value;
         }

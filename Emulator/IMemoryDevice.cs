@@ -8,11 +8,6 @@ namespace Ceres80Emu.Emulator
 {
     internal interface IMemoryDevice
     {
-        public ushort Size { get; }
-
-        public bool CanWrite { get; }
-
-        public bool CanRead { get; }
 
         public byte Read(ushort address);
 
@@ -22,8 +17,8 @@ namespace Ceres80Emu.Emulator
 
         public void Tick();
 
-        internal byte[] SaveState();
+        public byte[] SaveState();
 
-        internal void LoadState(byte[] state);
+        public void LoadState(byte[] state);
     }
 }

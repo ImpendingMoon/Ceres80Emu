@@ -2,40 +2,77 @@
 {
     internal class MemoryBus
     {
-        public void AddDevice(IMemoryDevice device, ushort startAddress, ushort endAddress, bool ioDevice)
+        public void AddMemoryDevice(IMemoryDevice device, ushort startAddress, ushort endAddress)
         {
-            if(ioDevice)
-                _ioDevices.Add(new DeviceMapping(device, startAddress, endAddress));
-            else
-                _memoryDevices.Add(new DeviceMapping(device, startAddress, endAddress));
+            _memoryDevices.Add(new DeviceMapping(device, startAddress, endAddress));
         }
 
-        public void RemoveDevice(IMemoryDevice device)
+        public void AddPortDevice(IMemoryDevice device, ushort startAddress, ushort endAddress)
         {
-            _memoryDevices.RemoveAll(d => d.Device == device);
-            _ioDevices.RemoveAll(d => d.Device == device);
+            _portDevices.Add(new DeviceMapping(device, startAddress, endAddress));
         }
 
-        public byte Read(ushort address, bool atPort = false, bool execute = false)
+        public byte ReadMemory(ushort address, MemoryAccessType accessType = MemoryAccessType.Standard)
         {
-            var list = atPort ? _ioDevices : _memoryDevices;
-            var device = list.FirstOrDefault(d => d.Contains(address));
+            var device = _memoryDevices.FirstOrDefault(d => d.Contains(address));
             if (device == null)
-                return 0x00; // Open bus
-
+                return 0xFF; // Open bus
             return device.Device.Read(address);
         }
 
-        public void Write(ushort address, byte data, bool atPort = false)
+        public byte ReadPort(byte port)
         {
-            var list = atPort ? _ioDevices : _memoryDevices;
-            var device = list.FirstOrDefault(d => d.Contains(address));
+            var device = _portDevices.FirstOrDefault(d => d.Contains(port));
             if (device == null)
-                return;
+                return 0xFF; // Open bus
+            return device.Device.Read(port);
+        }
+
+        public void WriteMemory(ushort address, byte data, MemoryAccessType accessType = MemoryAccessType.Standard)
+        {
+            var device = _memoryDevices.FirstOrDefault(d => d.Contains(address));
+            if (device == null)
+                return; // Open bus
             device.Device.Write(address, data);
         }
 
+        public void WritePort(byte port, byte data)
+        {
+            var device = _portDevices.FirstOrDefault(d => d.Contains(port));
+            if (device == null)
+                return; // Open bus
+            device.Device.Write(port, data);
+        }
+
         private List<DeviceMapping> _memoryDevices = new();
-        private List<DeviceMapping> _ioDevices = new();
+        private List<DeviceMapping> _portDevices = new();
+    }
+
+
+
+    internal enum MemoryAccessType
+    {
+        Standard,
+        Execute,
+        Immediate,
+        Stack,
+    }
+
+
+
+    internal class DeviceMapping
+    {
+        public IMemoryDevice Device { get; }
+        public ushort StartAddress { get; }
+        public ushort EndAddress { get; }
+
+        public DeviceMapping(IMemoryDevice device, ushort startAddress, ushort endAddress)
+        {
+            Device = device;
+            StartAddress = startAddress;
+            EndAddress = endAddress;
+        }
+
+        public bool Contains(ushort address) => address >= StartAddress && address <= EndAddress;
     }
 }
