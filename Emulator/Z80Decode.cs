@@ -1440,64 +1440,128 @@ namespace Ceres80Emu.Emulator
                 case >= 0x00 and <= 0x07:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += RLC_Reg(ref GetReg(regCode));
-                    instruction = $"RLC {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += RLC_Reg16Ptr(_registers.HL);
+                        instruction = $"RLC (HL)";
+                    }
+                    else
+                    {
+                        cycles += RLC_Reg(ref GetReg(regCode));
+                        instruction = $"RLC {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x08 and <= 0x0F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += RRC_Reg(ref GetReg(regCode));
-                    instruction = $"RRC {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += RRC_Reg16Ptr(_registers.HL);
+                        instruction = $"RRC (HL)";
+                    }
+                    else
+                    {
+                        cycles += RRC_Reg(ref GetReg(regCode));
+                        instruction = $"RRC {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x10 and <= 0x17:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += RL_Reg(ref GetReg(regCode));
-                    instruction = $"RL {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += RL_Reg16Ptr(_registers.HL);
+                        instruction = $"RL (HL)";
+                    }
+                    else
+                    {
+                        cycles += RL_Reg(ref GetReg(regCode));
+                        instruction = $"RL {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x18 and <= 0x1F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += RR_Reg(ref GetReg(regCode));
-                    instruction = $"RR {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += RR_Reg16Ptr(_registers.HL);
+                        instruction = $"RR (HL)";
+                    }
+                    else
+                    {
+                        cycles += RR_Reg(ref GetReg(regCode));
+                        instruction = $"RR {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x20 and <= 0x27:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += SLA_Reg(ref GetReg(regCode));
-                    instruction = $"SLA {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += SLA_Reg16Ptr(_registers.HL);
+                        instruction = $"SLA (HL)";
+                    }
+                    else
+                    {
+                        cycles += SLA_Reg(ref GetReg(regCode));
+                        instruction = $"SLA {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x28 and <= 0x2F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += SRA_Reg(ref GetReg(regCode));
-                    instruction = $"SRA {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += SRA_Reg16Ptr(_registers.HL);
+                        instruction = $"SRA (HL)";
+                    }
+                    else
+                    {
+                        cycles += SRA_Reg(ref GetReg(regCode));
+                        instruction = $"SRA {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x30 and <= 0x37:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += SLA_Reg(ref GetReg(regCode));
-                    instruction = $"SLL {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += SLA_Reg16Ptr(_registers.HL);
+                        instruction = $"SLL (HL)";
+                    }
+                    else
+                    {
+                        cycles += SLA_Reg(ref GetReg(regCode));
+                        instruction = $"SLL {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
                 case >= 0x38 and <= 0x3F:
                 {
                     byte regCode = (byte)(opcode & 0b111);
-                    cycles += SRL_Reg(ref GetReg(regCode));
-                    instruction = $"SRL {RegCodeToString(regCode)}";
+                    if (regCode == 0x06)
+                    {
+                        cycles += SRL_Reg16Ptr(_registers.HL);
+                        instruction = $"SRL (HL)";
+                    }
+                    else
+                    {
+                        cycles += SRL_Reg(ref GetReg(regCode));
+                        instruction = $"SRL {RegCodeToString(regCode)}";
+                    }
                     break;
                 }
 
