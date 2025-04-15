@@ -138,8 +138,8 @@ namespace Ceres80Emu.Emulator
             for (int j = 0; j < mnemonic.Length; j++)
             {
                 // Signed values 'd' are first
-                // Then 'n' for immediate values
                 // Then 'nn' for 16-bit immediate values
+                // Then 'n' for 8-bit immediate values
 
                 if (mnemonic[j] == 'd')
                 {
@@ -151,14 +151,6 @@ namespace Ceres80Emu.Emulator
                     result.AppendFormat("{0}", signedValue);
                     i++;
                 }
-                else if (mnemonic[j] == 'n')
-                {
-                    if (i >= immediateBytes.Count)
-                        throw new ArgumentOutOfRangeException("Not enough immediate bytes for mnemonic.");
-
-                    result.AppendFormat("0x{0:X2}", immediateBytes[i]);
-                    i++;
-                }
                 else if (j < mnemonic.Length - 1 && mnemonic.Substring(j, 2) == "nn")
                 {
                     if (i + 1 >= immediateBytes.Count)
@@ -167,6 +159,14 @@ namespace Ceres80Emu.Emulator
                     ushort nn = (ushort)((immediateBytes[i] << 8) | immediateBytes[i + 1]);
                     result.AppendFormat("0x{0:X4}", nn);
                     i += 2;
+                }
+                else if (mnemonic[j] == 'n')
+                {
+                    if (i >= immediateBytes.Count)
+                        throw new ArgumentOutOfRangeException("Not enough immediate bytes for mnemonic.");
+
+                    result.AppendFormat("0x{0:X2}", immediateBytes[i]);
+                    i++;
                 }
                 else
                 {
