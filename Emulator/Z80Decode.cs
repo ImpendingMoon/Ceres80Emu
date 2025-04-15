@@ -2260,7 +2260,7 @@ namespace Ceres80Emu.Emulator
 
         private byte FetchInstruction()
         {
-            byte opcode = _memoryBus.Read(_registers.PC, false, true);
+            byte opcode = _memoryBus.ReadMemory(_registers.PC, MemoryAccessType.Execute);
             _registers.PC++;
             return opcode;
         }

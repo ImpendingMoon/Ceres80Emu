@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace Ceres80Emu.Emulator
 {
-    /// <summary>
-    /// Emulates a Z80 CPU.
-    /// Z80.cs handles public-facing methods and members.
-    /// Z80Decode.cs handles decoding of instructions.
-    /// Z80Execute.cs handles execution of instructions.
-    /// This is because decoding takes several thousand lines of code.
-    /// </summary>
     internal partial class Z80
     {
         public Z80(MemoryBus memoryBus, InterruptManager interruptManager)
@@ -29,13 +22,15 @@ namespace Ceres80Emu.Emulator
         public int Tick()
         {
             // Only implement Interrupt Mode 1.
-            if (_interruptManager.IsInterruptPending() && _registers.IFF1 && !_justEnabledInterrupts)
+            // Don't implement NMI
+            if (_interruptManager.InterruptLine && _registers.IFF1 && !_justEnabledInterrupts)
             {
                 _halted = false;
                 Push_Reg16(_registers.PC);
                 _registers.PC = 0x0038;
-                _interruptManager.AcknowledgeInterrupt();
-                Console.WriteLine("Z80: Received interrupt");
+                _interruptManager.AcknowledgeLine = true;
+                _interruptManager.InterruptLine = false;
+                _registers.IFF1 = false;
                 return 13;
             }
 
@@ -96,30 +91,15 @@ namespace Ceres80Emu.Emulator
             // Repeaat instructions (LDIR, LDDR, etc.) stay on the same instruction until BC is 0
             if (_runningRepeatInstruction) { _registers.PC = startAddress; }
 
-            Console.WriteLine($"Z80: Executed instruction: {instruction} at {startAddress:X04}");
             return cycles;
         }
 
         public void Reset()
         {
-            // Every register starts at 0 (corrected by Z80 Undocumented Features by Sean Young)
-            foreach (var field in _registers.GetType().GetFields())
-            {
-                field.SetValue(_registers, 0);
-            }
+            _registers.Reset();
             _halted = false;
             _justEnabledInterrupts = false;
             _runningRepeatInstruction = false;
-        }
-
-        public byte[] SaveState()
-        {
-            return new byte[0];
-        }
-
-        public void LoadState(byte[] data)
-        {
-
         }
 
         private MemoryBus _memoryBus;
