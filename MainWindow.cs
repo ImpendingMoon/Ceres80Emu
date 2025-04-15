@@ -47,7 +47,6 @@ namespace Ceres80Emu
         {
             if (_emulationTask == null || _emulationTask.IsCompleted)
             {
-                MessageBox.Show("Emulator is not running.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             _cts.Cancel();
