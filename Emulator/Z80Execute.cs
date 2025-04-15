@@ -210,7 +210,7 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Pop_Reg16(ref ushort reg)
         {
-            reg = ReadShort(_registers.SP);
+            reg = ReadShort(_registers.SP, MemoryAccessType.Stack);
             _registers.SP += 2;
             return 10;
         }
@@ -225,8 +225,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Load_Increment()
         {
-            ushort value = ReadShort(_registers.HL);
-            WriteShort(_registers.DE, value);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
+            _memoryBus.WriteMemory(_registers.DE, value);
             _registers.HL++;
             _registers.DE++;
             _registers.BC--;
@@ -244,8 +244,8 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         private int Load_Decrement()
         {
-            ushort value = ReadShort(_registers.HL);
-            WriteShort(_registers.DE, value);
+            byte value = _memoryBus.ReadMemory(_registers.HL);
+            _memoryBus.WriteMemory(_registers.DE, value);
             _registers.HL--;
             _registers.DE--;
             _registers.BC--;
