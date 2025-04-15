@@ -12,6 +12,9 @@ namespace Ceres80Emu.Emulator
             _instruction = String.Empty;
             _instructionAddress = 0;
             _cycles = 0;
+            _interruptRaised = false;
+            _interruptAcknowledged = false;
+            _halted = false;
         }
 
         public void StopInstruction()
@@ -42,34 +45,54 @@ namespace Ceres80Emu.Emulator
                 }
             }
 
-            // "Executed 0x<opcode> <mnemonic> <immediate bytes> @ 0x<address>\n"
-            sb.Append("Executed 0x");
 
-            foreach(var b in opcodeBytes)
+
+            if(_interruptAcknowledged)
             {
-                sb.AppendFormat("{0:X2} ", b);
+                sb.Append("Interrupted\n");
+            }
+            else if(_halted)
+            {
+                sb.Append("Halted\n");
+            }
+            else
+            {
+                // "Executed 0x<opcode> <mnemonic> <immediate bytes> @ 0x<address>\n"
+                sb.Append("Executed 0x");
+
+                foreach (var b in opcodeBytes)
+                {
+                    sb.AppendFormat("{0:X2} ", b);
+                }
+
+                // Fill in mnemonic placeholders with actual data
+                sb.AppendFormat("'{0}'", FillInInstruction(_instruction, immediateBytes));
+                sb.AppendFormat(" @ 0x{0:X4} in {1} cycles.\n", _instructionAddress, _cycles);
             }
 
-            // Fill in mnemonic placeholders with actual data
-            sb.Append(FillInInstruction(_instruction, immediateBytes));
-            sb.AppendFormat(" @ 0x{0:X4}\n", _instructionAddress);
 
             // List the other accesses under this instruction
             foreach(var access in otherAccesses)
             {
                 // Example:
                 // "    Read Value 0xA1 @ 0xF800"
+                // "    Wrote Value 0xA1 @ 0xF801"
                 sb.Append("\t");
                 sb.Append(access.Read ? "Read Value " : "Wrote Value ");
                 sb.AppendFormat("0x{0:X2} ", access.Value);
 
                 if(access.Port)
                 {
-                    sb.AppendFormat("@ Port 0x{0:X2}", access.Address);
+                    sb.AppendFormat("@ Port 0x{0:X2} ", access.Address);
                 }
                 else
                 {
-                    sb.AppendFormat("@ Address 0x{0:X4}", access.Address);
+                    sb.AppendFormat("@ Address 0x{0:X4} ", access.Address);
+                }
+
+                if(access.AccessType == MemoryAccessType.Stack)
+                {
+                    sb.Append("(Stack)");
                 }
 
                 sb.Append("\n");
@@ -127,6 +150,11 @@ namespace Ceres80Emu.Emulator
             _interruptAcknowledged = !raised;
         }
 
+        public void AddHalted()
+        {
+            _halted = true;
+        }
+
         private string FillInInstruction(string mnemonic, List<byte> immediateBytes)
         {
             if (string.IsNullOrEmpty(mnemonic) || immediateBytes.Count == 0)
@@ -156,9 +184,10 @@ namespace Ceres80Emu.Emulator
                     if (i + 1 >= immediateBytes.Count)
                         throw new ArgumentOutOfRangeException("Not enough immediate bytes for mnemonic.");
 
-                    ushort nn = (ushort)((immediateBytes[i] << 8) | immediateBytes[i + 1]);
+                    ushort nn = (ushort)(immediateBytes[i] | (immediateBytes[i + 1] << 8));
                     result.AppendFormat("0x{0:X4}", nn);
                     i += 2;
+                    j++;
                 }
                 else if (mnemonic[j] == 'n')
                 {
@@ -184,6 +213,7 @@ namespace Ceres80Emu.Emulator
         private int _cycles = 0;
         private bool _interruptRaised = false;
         private bool _interruptAcknowledged = false;
+        private bool _halted = false;
 
         private struct AccessEvent
         {
