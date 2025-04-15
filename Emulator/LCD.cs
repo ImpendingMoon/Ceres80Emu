@@ -9,7 +9,7 @@ namespace Ceres80Emu.Emulator
         {
             _lcdBitmap = new Bitmap(128, 64, PixelFormat.Format8bppIndexed);
             _palette = _lcdBitmap.Palette;
-            _palette.Entries[0] = Color.Black;
+            _palette.Entries[0] = Color.Blue;
             _palette.Entries[1] = Color.White;
             _lcdBitmap.Palette = _palette;
         }
@@ -65,7 +65,7 @@ namespace Ceres80Emu.Emulator
             int width = data.Width;
 
             // Combine two halves into one array
-            byte[] pixelBytes = new byte[stride * height];
+            byte[] pixelBytes = new byte[width * height];
 
             for (int y = 0; y < height; y++)
             {

@@ -56,6 +56,7 @@ namespace Ceres80Emu
         private void MainWindow_Load(object sender, EventArgs e)
         {
             Ceres80 = new Emulator.Ceres80();
+            pictureBoxInterpolationMode1.Image = Ceres80.GetBitmap();
         }
 
         private void loadFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
