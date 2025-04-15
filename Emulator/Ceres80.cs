@@ -10,7 +10,14 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         public void Start()
         {
-            _running = true;
+            lock (_lock)
+            {
+                if (_running)
+                {
+                    throw new InvalidOperationException("Emulator is already running.");
+                }
+                _running = true;
+            }
             while (_running)
             {
                 RunFrame();
@@ -18,11 +25,25 @@ namespace Ceres80Emu.Emulator
         }
 
         /// <summary>
-        /// Stop the emulator.
+        /// Stops the emulator.
         /// </summary>
         public void Stop()
         {
-            _running = false;
+            lock (_lock)
+            {
+                _pauseEvent.Wait();
+                _running = false;
+            }
+        }
+
+        public void Pause()
+        {
+            _pauseEvent.Reset();
+        }
+
+        public void Resume()
+        {
+            _pauseEvent.Set();
         }
 
         /// <summary>
@@ -30,21 +51,27 @@ namespace Ceres80Emu.Emulator
         /// </summary>
         public void Step()
         {
-            Tick(1);
+            lock (_lock)
+            {
+                Tick(1);
+            }
         }
 
         /// <summary>
         /// Set the speed of the emulator.
         /// </summary>
-        /// <param name="multiplier">Percent of normal speed. 100x is default. 0x is single-step mode.</param>
-        /// <exception cref="ArgumentException">When multiplier is less than 0 or greater than 500</exception>
+        /// <param name="multiplier">Percent of normal speed. 100x is default.</param>
+        /// <exception cref="ArgumentException">When multiplier is less than 1 or greater than 500</exception>
         public void SetSpeed(int multiplier)
         {
-            if (multiplier < 0 || multiplier > 500)
+            lock (_lock)
             {
-                throw new ArgumentException("Speed must be between 0x and 500x");
+                if (multiplier < 1 || multiplier > 500)
+                {
+                    throw new ArgumentException("Speed must be between 0x and 500x");
+                }
+                _instructionsPerFrame = (int)(_instructionsPerSecond * (multiplier / 100f)) / _framesPerSecond;
             }
-            _instructionsPerFrame = (int)(_instructionsPerSecond * (multiplier / 100f)) / _framesPerSecond;
         }
 
         /// <summary>
@@ -54,11 +81,14 @@ namespace Ceres80Emu.Emulator
         /// <exception cref="ArgumentException">If data size > 32768 bytes</exception>
         public void LoadROM(byte[] data)
         {
-            if (data.Length > _rom.Size)
+            lock (_lock)
             {
-                throw new ArgumentException("File size exceeds ROM size.");
+                if (data.Length > _rom.Size)
+                {
+                    throw new ArgumentException("File size exceeds ROM size.");
+                }
+                _rom.LoadState(data);
             }
-            _rom.LoadState(data);
         }
 
         /// <summary>
@@ -68,11 +98,14 @@ namespace Ceres80Emu.Emulator
         /// <exception cref="ArgumentException">If data size > 32768 bytes</exception>
         public void LoadRAM(byte[] data)
         {
-            if (data.Length > _ram.Size)
+            lock (_lock)
             {
-                throw new ArgumentException("File size exceeds RAM size.");
+                if (data.Length > _ram.Size)
+                {
+                    throw new ArgumentException("File size exceeds RAM size.");
+                }
+                _ram.LoadState(data);
             }
-            _ram.LoadState(data);
         }
 
         public Ceres80()
@@ -98,19 +131,22 @@ namespace Ceres80Emu.Emulator
 
         public void Reset()
         {
-            _rom.Reset();
-            _ram.Reset();
-            _cpu.Reset();
-            _ctc.Reset();
-            _pio.Reset();
-            _lcd.Reset();
+            lock (_lock)
+            {
+                _rom.Reset();
+                _ram.Reset();
+                _cpu.Reset();
+                _ctc.Reset();
+                _pio.Reset();
+                _lcd.Reset();
+            }
         }
 
 
         private void Tick(int cycles)
         {
             int cyclesElapsed = 0;
-            while(cyclesElapsed < cycles)
+            while (cyclesElapsed < cycles)
             {
                 int currentCycles = _cpu.Tick();
                 for (int i = 0; i < currentCycles; i++)
@@ -125,16 +161,19 @@ namespace Ceres80Emu.Emulator
 
         private void RunFrame()
         {
-            _stopwatch.Restart();
-            // TODO: Process input
-            Tick(_instructionsPerFrame);
-            // TODO: Update display
-            _stopwatch.Stop();
-            // Wait for the next frame
-            long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
-            if (elapsedMilliseconds < _secondsPerFrame * 1000)
+            lock (_lock)
             {
-                Thread.Sleep((int)(_secondsPerFrame * 1000) - (int)elapsedMilliseconds);
+                _stopwatch.Restart();
+                // TODO: Process input
+                Tick(_instructionsPerFrame);
+                // TODO: Update display
+                _stopwatch.Stop();
+                // Wait for the next frame
+                long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
+                if (elapsedMilliseconds < _secondsPerFrame * 1000)
+                {
+                    Thread.Sleep((int)(_secondsPerFrame * 1000) - (int)elapsedMilliseconds);
+                }
             }
         }
 
@@ -148,12 +187,13 @@ namespace Ceres80Emu.Emulator
         private LCD _lcd;
 
         private Stopwatch _stopwatch = new Stopwatch();
+        private bool _running = false;
+        private object _lock = new object();
+        private ManualResetEventSlim _pauseEvent = new ManualResetEventSlim(true);
 
         private const int _framesPerSecond = 60;
         private const float _secondsPerFrame = 1f / _framesPerSecond;
         private const int _instructionsPerSecond = 6144000;
         private int _instructionsPerFrame = _instructionsPerSecond / _framesPerSecond;
-        private bool _running = false;
-
     }
 }

@@ -30,7 +30,8 @@
         {
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
-            openToolStripMenuItem = new ToolStripMenuItem();
+            loadFirmwareToolStripMenuItem = new ToolStripMenuItem();
+            loadProgramToolStripMenuItem = new ToolStripMenuItem();
             pictureBoxInterpolationMode1 = new PictureBoxInterpolationMode();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxInterpolationMode1).BeginInit();
@@ -47,17 +48,24 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadFirmwareToolStripMenuItem, loadProgramToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
             // 
-            // openToolStripMenuItem
+            // loadFirmwareToolStripMenuItem
             // 
-            openToolStripMenuItem.Name = "openToolStripMenuItem";
-            openToolStripMenuItem.Size = new Size(103, 22);
-            openToolStripMenuItem.Text = "Open";
-            openToolStripMenuItem.Click += openToolStripMenuItem_Click;
+            loadFirmwareToolStripMenuItem.Name = "loadFirmwareToolStripMenuItem";
+            loadFirmwareToolStripMenuItem.Size = new Size(180, 22);
+            loadFirmwareToolStripMenuItem.Text = "Load Firmware";
+            loadFirmwareToolStripMenuItem.Click += loadFirmwareToolStripMenuItem_Click;
+            // 
+            // loadProgramToolStripMenuItem
+            // 
+            loadProgramToolStripMenuItem.Name = "loadProgramToolStripMenuItem";
+            loadProgramToolStripMenuItem.Size = new Size(180, 22);
+            loadProgramToolStripMenuItem.Text = "Load Program";
+            loadProgramToolStripMenuItem.Click += loadProgramToolStripMenuItem_Click;
             // 
             // pictureBoxInterpolationMode1
             // 
@@ -96,7 +104,8 @@
 
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
-        private ToolStripMenuItem openToolStripMenuItem;
         private PictureBoxInterpolationMode pictureBoxInterpolationMode1;
+        private ToolStripMenuItem loadFirmwareToolStripMenuItem;
+        private ToolStripMenuItem loadProgramToolStripMenuItem;
     }
 }
