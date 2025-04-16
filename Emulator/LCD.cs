@@ -80,7 +80,7 @@ namespace Ceres80Emu.Emulator
             Marshal.Copy(pixelBytes, 0, data.Scan0, pixelBytes.Length);
             _lcdBitmap.UnlockBits(data);
 
-            return _lcdBitmap;
+            return _lcdBitmap.Clone(new Rectangle(0, 0, 128, 64), PixelFormat.Format8bppIndexed);
         }
 
         public byte[] SaveState()
