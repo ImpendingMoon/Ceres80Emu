@@ -26,17 +26,17 @@
         public void WriteCommand(byte data)
         {
             // Display On/Off
-            if ((data & 0b00111110) == 0b00111110)
+            if ((data & 0b11111110) == 0b00111110)
             {
                 _displayOn = (data & 1) == 1;
             }
             // Set Address (Y address)
-            else if ((data & 0b01000000) == 0b01000000)
+            else if ((data & 0b11000000) == 0b01000000)
             {
                 _y = (byte)(data & 0b00111111);
             }
             // Set Page (X address)
-            else if ((data & 0b10100000) == 0b10100000)
+            else if ((data & 0b11111000) == 0b10111000)
             {
                 _x = (byte)(data & 0b00000111);
             }
