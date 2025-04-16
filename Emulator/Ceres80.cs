@@ -11,19 +11,22 @@ namespace Ceres80Emu.Emulator
         public void Start(CancellationToken token)
         {
             _running = true;
-            while (_running && !token.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
-                lock (_lock)
+                while(_running)
                 {
-                    _stopwatch.Restart();
-                    RunFrame();
-                    _stopwatch.Stop();
-                }
+                    lock (_lock)
+                    {
+                        _stopwatch.Restart();
+                        RunFrame();
+                        _stopwatch.Stop();
+                    }
 
-                // Wait for the next frame
-                if (_stopwatch.ElapsedMilliseconds < _secondsPerFrame * 1000)
-                {
-                    Thread.Sleep((int)(_secondsPerFrame * 1000 - _stopwatch.ElapsedMilliseconds));
+                    // Wait for the next frame
+                    if (_stopwatch.ElapsedMilliseconds < _secondsPerFrame * 1000)
+                    {
+                        Thread.Sleep((int)(_secondsPerFrame * 1000 - _stopwatch.ElapsedMilliseconds));
+                    }
                 }
             }
         }
@@ -138,14 +141,31 @@ namespace Ceres80Emu.Emulator
 
         public void Reset()
         {
+            Pause();
             lock (_lock)
             {
-                _rom.Reset();
-                _ram.Reset();
                 _cpu.Reset();
                 _ctc.Reset();
                 _pio.Reset();
                 _lcd.Reset();
+            }
+        }
+
+        public void ClearROM()
+        {
+            Pause();
+            lock (_lock)
+            {
+                _rom.Reset();
+            }
+        }
+
+        public void ClearRAM()
+        {
+            Pause();
+            lock (_lock)
+            {
+                _ram.Reset();
             }
         }
 
