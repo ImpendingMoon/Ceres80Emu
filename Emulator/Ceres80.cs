@@ -8,51 +8,39 @@ namespace Ceres80Emu.Emulator
         /// Start the emulator.
         /// Will lock up the UI thread if run on the main thread.
         /// </summary>
-        public void Start()
+        public void Start(CancellationToken token)
         {
-            lock (_lock)
+            _running = true;
+            while (_running && !token.IsCancellationRequested)
             {
-                if (_running)
+                lock (_lock)
                 {
-                    throw new InvalidOperationException("Emulator is already running.");
+                    _stopwatch.Restart();
+                    RunFrame();
+                    _stopwatch.Stop();
                 }
-                _running = true;
-            }
-            while (_running)
-            {
-                _stopwatch.Restart();
-                RunFrame();
-                _stopwatch.Stop();
 
                 // Wait for the next frame
-                long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
-                if (elapsedMilliseconds < _secondsPerFrame * 1000)
+                if (_stopwatch.ElapsedMilliseconds < _secondsPerFrame * 1000)
                 {
-                    Thread.Sleep((int)(_secondsPerFrame * 1000) - (int)elapsedMilliseconds);
+                    Thread.Sleep((int)(_secondsPerFrame * 1000 - _stopwatch.ElapsedMilliseconds));
                 }
-            }
-        }
-
-        /// <summary>
-        /// Stops the emulator.
-        /// </summary>
-        public void Stop()
-        {
-            lock (_lock)
-            {
-                _pauseEvent.Wait();
-                _running = false;
             }
         }
 
         public void Pause()
         {
-            _pauseEvent.Reset();
+            // Needs to be called in the middle of execution by DebugManager for breakpoints
+            // Locking _lock would result in a deadlock
+            Volatile.Write(ref _running, false);
         }
 
         public void Resume()
         {
-            _pauseEvent.Set();
+            lock (_lock)
+            {
+                _running = true;
+            }
         }
 
         /// <summary>
@@ -190,7 +178,12 @@ namespace Ceres80Emu.Emulator
             }
         }
 
-        public event Action FrameRendered;
+        public event Action? FrameRendered;
+
+        private bool _running = false;
+        private Stopwatch _stopwatch = new Stopwatch();
+        private object _lock = new object();
+        
 
         private Z80 _cpu;
         private MemoryBus _bus;
@@ -201,11 +194,6 @@ namespace Ceres80Emu.Emulator
         private CTC _ctc;
         private PIO _pio;
         private LCD _lcd;
-
-        private Stopwatch _stopwatch = new Stopwatch();
-        private bool _running = false;
-        private object _lock = new object();
-        private ManualResetEventSlim _pauseEvent = new ManualResetEventSlim(true);
 
         private const int _framesPerSecond = 60;
         private const float _secondsPerFrame = 1f / _framesPerSecond;

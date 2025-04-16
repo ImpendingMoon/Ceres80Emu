@@ -30,11 +30,10 @@ namespace Ceres80Emu
             {
                 try
                 {
-                    Ceres80.Start();
+                    Ceres80.Start(_cts.Token);
                 }
                 catch (OperationCanceledException)
                 {
-                    // Handle cancellation
                 }
                 catch (Exception ex)
                 {
@@ -49,6 +48,9 @@ namespace Ceres80Emu
             {
                 return;
             }
+            Ceres80.Pause();
+            Ceres80.Reset();
+
             _cts.Cancel();
             _emulationTask.Wait();
         }
