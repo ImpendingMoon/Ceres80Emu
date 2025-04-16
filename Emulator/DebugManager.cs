@@ -53,7 +53,7 @@ namespace Ceres80Emu.Emulator
             }
             else if(_halted)
             {
-                sb.Append("Halted\n");
+                return;
             }
             else
             {
