@@ -20,7 +20,16 @@ namespace Ceres80Emu.Emulator
             }
             while (_running)
             {
+                _stopwatch.Restart();
                 RunFrame();
+                _stopwatch.Stop();
+
+                // Wait for the next frame
+                long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
+                if (elapsedMilliseconds < _secondsPerFrame * 1000)
+                {
+                    Thread.Sleep((int)(_secondsPerFrame * 1000) - (int)elapsedMilliseconds);
+                }
             }
         }
 
@@ -175,17 +184,9 @@ namespace Ceres80Emu.Emulator
         {
             lock (_lock)
             {
-                _stopwatch.Restart();
                 // TODO: Process input
                 Tick(_instructionsPerFrame);
                 FrameRendered?.Invoke();
-                _stopwatch.Stop();
-                // Wait for the next frame
-                long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
-                if (elapsedMilliseconds < _secondsPerFrame * 1000)
-                {
-                    Thread.Sleep((int)(_secondsPerFrame * 1000) - (int)elapsedMilliseconds);
-                }
             }
         }
 
