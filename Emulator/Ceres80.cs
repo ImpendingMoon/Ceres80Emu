@@ -54,6 +54,7 @@ namespace Ceres80Emu.Emulator
             lock (_lock)
             {
                 Tick(1);
+                FrameRendered?.Invoke();
             }
         }
 
@@ -177,7 +178,7 @@ namespace Ceres80Emu.Emulator
                 _stopwatch.Restart();
                 // TODO: Process input
                 Tick(_instructionsPerFrame);
-                // TODO: Update display
+                FrameRendered?.Invoke();
                 _stopwatch.Stop();
                 // Wait for the next frame
                 long elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
@@ -187,6 +188,8 @@ namespace Ceres80Emu.Emulator
                 }
             }
         }
+
+        public event Action FrameRendered;
 
         private Z80 _cpu;
         private MemoryBus _bus;

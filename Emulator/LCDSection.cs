@@ -75,8 +75,9 @@
                         for(int bit = 0; bit < 8; bit++)
                         {
                             int destX = (srcY + _z) % height; // Same X = 1 column
-                            int destY = srcX * 8 + bit; // Different Y = 8 rows
-                            data[destX, destY] = (byte)((_framebuffer[srcX, srcY] >> bit) & 1);
+                            int destY = (srcX * 8) + bit; // Different Y = 8 rows
+                            byte value = (byte)((_framebuffer[srcY, srcX] >> bit) & 1);
+                            data[destX, destY] = value;
                         }
                     }
                 }

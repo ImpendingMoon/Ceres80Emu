@@ -57,6 +57,7 @@ namespace Ceres80Emu
         {
             Ceres80 = new Emulator.Ceres80();
             pictureBoxInterpolationMode1.Image = Ceres80.GetBitmap();
+            Ceres80.FrameRendered += OnFrameRendered;
         }
 
         private void loadFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
@@ -114,6 +115,12 @@ namespace Ceres80Emu
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void OnFrameRendered()
+        {
+            pictureBoxInterpolationMode1.Image = Ceres80.GetBitmap();
+            pictureBoxInterpolationMode1.Invalidate();
         }
     }
 }
