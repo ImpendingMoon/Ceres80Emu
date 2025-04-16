@@ -8,13 +8,16 @@ namespace Ceres80Emu
         private static extern bool AllocConsole();
 
         private Emulator.Ceres80 Ceres80;
-        private Task _emulationTask;
-        private CancellationTokenSource _cts;
+        private Task? _emulationTask;
+        private CancellationTokenSource? _cts;
+
+        private bool _paused = false;
 
         public MainWindow()
         {
             InitializeComponent();
             AllocConsole();
+            Ceres80 = new Emulator.Ceres80();
         }
 
         private void StartEmulator()
@@ -40,6 +43,8 @@ namespace Ceres80Emu
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }, _cts.Token);
+            pauseResumeToolStripMenuItem.Enabled = true;
+            pauseResumeToolStripMenuItem.Checked = false;
         }
 
         private void StopEmulator()
@@ -53,11 +58,13 @@ namespace Ceres80Emu
 
             _cts.Cancel();
             _emulationTask.Wait();
+
+            pauseResumeToolStripMenuItem.Enabled = false;
+            pauseResumeToolStripMenuItem.Checked = false;
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            Ceres80 = new Emulator.Ceres80();
             pictureBoxInterpolationMode1.Image = Ceres80.GetBitmap();
             Ceres80.FrameRendered += OnFrameRendered;
         }
@@ -69,7 +76,6 @@ namespace Ceres80Emu
                 Filter = "ROM files (*.bin)|*.bin|All files (*.*)|*.*",
                 Title = "Open ROM File"
             };
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.RestoreDirectory = true;
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
@@ -83,7 +89,8 @@ namespace Ceres80Emu
                     StopEmulator();
                     Ceres80.LoadROM(romData);
                     StartEmulator();
-                } catch(ArgumentException ex)
+                }
+                catch (ArgumentException ex)
                 {
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -97,7 +104,6 @@ namespace Ceres80Emu
                 Filter = "Program files (*.bin)|*.bin|All files (*.*)|*.*",
                 Title = "Open Program File"
             };
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.RestoreDirectory = true;
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
@@ -123,6 +129,19 @@ namespace Ceres80Emu
         {
             pictureBoxInterpolationMode1.Image = Ceres80.GetBitmap();
             pictureBoxInterpolationMode1.Invalidate();
+        }
+
+        private void pauseResumeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _paused = !_paused;
+            if(_paused)
+            {
+                Ceres80.Pause();
+            }
+            else
+            {
+                Ceres80.Resume();
+            }
         }
     }
 }

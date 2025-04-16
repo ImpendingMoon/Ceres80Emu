@@ -32,6 +32,8 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             loadFirmwareToolStripMenuItem = new ToolStripMenuItem();
             loadProgramToolStripMenuItem = new ToolStripMenuItem();
+            controlToolStripMenuItem = new ToolStripMenuItem();
+            pauseResumeToolStripMenuItem = new ToolStripMenuItem();
             pictureBoxInterpolationMode1 = new PictureBoxInterpolationMode();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxInterpolationMode1).BeginInit();
@@ -39,7 +41,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, controlToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 24);
@@ -48,6 +50,7 @@
             // 
             // fileToolStripMenuItem
             // 
+            fileToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadFirmwareToolStripMenuItem, loadProgramToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
@@ -55,17 +58,36 @@
             // 
             // loadFirmwareToolStripMenuItem
             // 
+            loadFirmwareToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
             loadFirmwareToolStripMenuItem.Name = "loadFirmwareToolStripMenuItem";
-            loadFirmwareToolStripMenuItem.Size = new Size(180, 22);
+            loadFirmwareToolStripMenuItem.Size = new Size(152, 22);
             loadFirmwareToolStripMenuItem.Text = "Load Firmware";
             loadFirmwareToolStripMenuItem.Click += loadFirmwareToolStripMenuItem_Click;
             // 
             // loadProgramToolStripMenuItem
             // 
+            loadProgramToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
             loadProgramToolStripMenuItem.Name = "loadProgramToolStripMenuItem";
-            loadProgramToolStripMenuItem.Size = new Size(180, 22);
+            loadProgramToolStripMenuItem.Size = new Size(152, 22);
             loadProgramToolStripMenuItem.Text = "Load Program";
             loadProgramToolStripMenuItem.Click += loadProgramToolStripMenuItem_Click;
+            // 
+            // controlToolStripMenuItem
+            // 
+            controlToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            controlToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { pauseResumeToolStripMenuItem });
+            controlToolStripMenuItem.Name = "controlToolStripMenuItem";
+            controlToolStripMenuItem.Size = new Size(59, 20);
+            controlToolStripMenuItem.Text = "Control";
+            // 
+            // pauseResumeToolStripMenuItem
+            // 
+            pauseResumeToolStripMenuItem.CheckOnClick = true;
+            pauseResumeToolStripMenuItem.Enabled = false;
+            pauseResumeToolStripMenuItem.Name = "pauseResumeToolStripMenuItem";
+            pauseResumeToolStripMenuItem.Size = new Size(180, 22);
+            pauseResumeToolStripMenuItem.Text = "Pause";
+            pauseResumeToolStripMenuItem.Click += pauseResumeToolStripMenuItem_Click;
             // 
             // pictureBoxInterpolationMode1
             // 
@@ -107,5 +129,7 @@
         private PictureBoxInterpolationMode pictureBoxInterpolationMode1;
         private ToolStripMenuItem loadFirmwareToolStripMenuItem;
         private ToolStripMenuItem loadProgramToolStripMenuItem;
+        private ToolStripMenuItem controlToolStripMenuItem;
+        private ToolStripMenuItem pauseResumeToolStripMenuItem;
     }
 }
