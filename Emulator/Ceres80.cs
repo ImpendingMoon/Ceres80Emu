@@ -13,7 +13,7 @@ namespace Ceres80Emu.Emulator
             _running = true;
             while (!token.IsCancellationRequested)
             {
-                while(_running)
+                while (_running)
                 {
                     lock (_lock)
                     {
@@ -117,7 +117,7 @@ namespace Ceres80Emu.Emulator
             }
         }
 
-        public Ceres80()
+        public Ceres80(InputManager inputManager)
         {
             // Initialization order matters. Do not change.
             _debugManager = new DebugManager();
@@ -137,6 +137,7 @@ namespace Ceres80Emu.Emulator
 
             _cpu = new Z80(_bus, _interruptManager, _debugManager);
 
+            _inputManager = inputManager;
         }
 
         public void Reset()
@@ -175,6 +176,7 @@ namespace Ceres80Emu.Emulator
             int cyclesElapsed = 0;
             while (cyclesElapsed < cycles)
             {
+                _pio.SetButtonState(_inputManager.GetButtonStateByte());
                 _debugManager.StartInstruction();
                 int currentCycles = _cpu.Tick();
                 for (int i = 0; i < currentCycles; i++)
@@ -192,7 +194,6 @@ namespace Ceres80Emu.Emulator
         {
             lock (_lock)
             {
-                // TODO: Process input
                 Tick(_instructionsPerFrame);
                 FrameRendered?.Invoke();
             }
@@ -203,7 +204,7 @@ namespace Ceres80Emu.Emulator
         private bool _running = false;
         private Stopwatch _stopwatch = new Stopwatch();
         private object _lock = new object();
-        
+        private InputManager _inputManager;
 
         private Z80 _cpu;
         private MemoryBus _bus;

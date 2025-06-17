@@ -9,13 +9,19 @@ namespace Ceres80Emu
 
 
         private EmulatorController _emulator;
+        private InputManager _inputManager;
 
         public MainWindow()
         {
             InitializeComponent();
             AllocConsole();
-            _emulator = new EmulatorController();
+            _inputManager = new InputManager();
+            _emulator = new EmulatorController(_inputManager);
             _emulator.FrameUpdated += UpdateFrame;
+
+            KeyPreview = true;
+            KeyDown += MainWindow_KeyDown;
+            KeyUp += MainWindow_KeyUp;
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
@@ -26,7 +32,7 @@ namespace Ceres80Emu
         private void loadFirmwareToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var data = FileLoader.LoadBinaryFile("Open Firmware Image");
-            if(data != null)
+            if (data != null)
             {
                 try
                 {
@@ -77,6 +83,18 @@ namespace Ceres80Emu
         {
             bool paused = _emulator.TogglePause();
             SetPauseState(true, paused);
+        }
+
+        private void MainWindow_KeyDown(object? sender, KeyEventArgs e)
+        {
+            _inputManager.HandleKeyDown(e.KeyCode);
+            e.Handled = true;
+        }
+
+        private void MainWindow_KeyUp(object? sender, KeyEventArgs e)
+        {
+            _inputManager?.HandleKeyUp(e.KeyCode);
+            e.Handled = true;
         }
     }
 }

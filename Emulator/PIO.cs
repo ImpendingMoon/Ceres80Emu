@@ -16,7 +16,12 @@ namespace Ceres80Emu.Emulator
 
         public byte Read(ushort address)
         {
-            return 0;
+            switch (address)
+            {
+                // Channel A data
+                case 0: return _buttonState;
+                default: return 0;
+            }
         }
 
         public void Write(ushort address, byte data)
@@ -31,6 +36,11 @@ namespace Ceres80Emu.Emulator
         {
         }
 
+        public void SetButtonState(byte buttonState)
+        {
+            _buttonState = buttonState;
+        }
+
         public byte[] SaveState()
         {
             return new byte[0];
@@ -39,5 +49,7 @@ namespace Ceres80Emu.Emulator
         public void LoadState(byte[] state)
         {
         }
+
+        private byte _buttonState = 0xFF;
     }
 }

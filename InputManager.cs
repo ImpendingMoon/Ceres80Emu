@@ -11,7 +11,7 @@
         {
             byte result = 0;
 
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
                 // Buttons are pulled high and shorted to ground when pressed
                 byte value = (byte)(_pressedButtons[i] ? 0 : 1);
@@ -23,9 +23,9 @@
 
         public void HandleKeyDown(Keys key)
         {
-            if(_keyMap.TryGetValue(key, out InputButton button))
+            if (_keyMap.TryGetValue(key, out InputButton button))
             {
-                _pressedButtons[(int) button] = true;
+                _pressedButtons[(int)button] = true;
             }
         }
 

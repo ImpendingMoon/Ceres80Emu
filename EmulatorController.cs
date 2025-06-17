@@ -5,9 +5,9 @@
         public event Action? FrameUpdated;
         public Bitmap CurrentFrame => _ceres80.GetBitmap();
 
-        public EmulatorController()
+        public EmulatorController(InputManager inputManager)
         {
-            _ceres80 = new Emulator.Ceres80();
+            _ceres80 = new Emulator.Ceres80(inputManager);
             _ceres80.FrameRendered += () => FrameUpdated?.Invoke();
         }
 
@@ -45,7 +45,7 @@
         public bool TogglePause()
         {
             _paused = !_paused;
-            if(_paused)
+            if (_paused)
             {
                 _ceres80.Pause();
             }
@@ -55,7 +55,6 @@
             }
             return _paused;
         }
-
 
         private Emulator.Ceres80 _ceres80;
         private Task? _emulationTask;
