@@ -392,7 +392,7 @@ namespace Ceres80Emu.Emulator
                 }
                 case 0x3A:
                 {
-                    cycles += Load_Reg_Reg16Ptr(ref _registers.A, _registers.HL);
+                    cycles += Load_Reg_ImmPtr(ref _registers.A);
                     instruction = "LD A, (nn)";
                     break;
                 }

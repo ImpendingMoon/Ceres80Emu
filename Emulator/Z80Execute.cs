@@ -38,6 +38,13 @@ namespace Ceres80Emu.Emulator
             return 7;
         }
 
+        private int Load_Reg_ImmPtr(ref byte reg)
+        {
+            ushort address = ReadImm16();
+            reg = _memoryBus.ReadMemory(address);
+            return 13;
+        }
+
         /// <summary>
         /// Loads an immediate value into a register pair
         /// <br/>Example: LD BC, nn
