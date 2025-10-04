@@ -23,6 +23,8 @@ internal static class Window
         IsInitialized = true;
     }
 
+
+
     public static void FreeWindow()
     {
         if (!IsInitialized)
@@ -34,6 +36,8 @@ internal static class Window
         Raylib.CloseWindow();
         IsInitialized = false;
     }
+
+
 
     public static void DrawWindow()
     {

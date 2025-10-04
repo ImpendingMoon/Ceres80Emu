@@ -4,7 +4,7 @@ namespace Ceres80Emu;
 
 internal static class Program
 {
-    static RenderTexture2D target = Raylib.LoadRenderTexture(Constants.DisplayWidth, Constants.DisplayHeight);
+    public static bool InternalWindowShouldClose { get; set; } = false;
 
     static void Main(string[] args)
     {
@@ -13,12 +13,14 @@ internal static class Program
 
         Window.InitWindow();
 
-        while (!Raylib.WindowShouldClose())
+        Debugger.PrintStartupText();
+
+        while (!Raylib.WindowShouldClose() && !InternalWindowShouldClose)
         {
+            Debugger.ProcessInput();
             Window.DrawWindow();
         }
 
         Window.FreeWindow();
     }
 }
-
