@@ -1,9 +1,8 @@
-﻿namespace Ceres80Emu
+﻿namespace Ceres80Emu;
+
+public static class Constants
 {
-    internal static class Constants
-    {
-        public const string Version = "0.0.1";
-        public const int DisplayWidth = 128;
-        public const int DisplayHeight = 64;
-    }
+    public const string Version = "0.0.1";
+    public const int DisplayWidth = 128;
+    public const int DisplayHeight = 64;
 }

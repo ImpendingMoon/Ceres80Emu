@@ -2,9 +2,9 @@
 
 namespace Ceres80Emu;
 
-internal static class Program
+public static class Program
 {
-    public static bool InternalWindowShouldClose { get; set; } = false;
+    public static bool publicWindowShouldClose { get; set; } = false;
 
     static void Main(string[] args)
     {
@@ -15,7 +15,7 @@ internal static class Program
 
         Debugger.PrintStartupText();
 
-        while (!Raylib.WindowShouldClose() && !InternalWindowShouldClose)
+        while (!Raylib.WindowShouldClose() && !publicWindowShouldClose)
         {
             Debugger.ProcessInput();
             Window.DrawWindow();

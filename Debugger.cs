@@ -1,6 +1,6 @@
 ﻿namespace Ceres80Emu;
 
-internal static class Debugger
+public static class Debugger
 {
     public static bool Paused { get; set; } = true;
 
@@ -10,7 +10,7 @@ internal static class Debugger
     {
         Console.Write(
             $"Ceres80Emu v{Constants.Version}\n" +
-            $"(C) ImpendingMoon, 2025. Licensed under BSD 3-Clause\n" +
+            $"(C) ImpendingMoon, 2025. Licensed under BSD 3-Clause.\n" +
             $"\n" +
             $"Type 'help' for a list of available commands." +
             $"\n\n" +
@@ -80,6 +80,21 @@ internal static class Debugger
 
     private static void Quit()
     {
-        Program.InternalWindowShouldClose = true;
+        Program.publicWindowShouldClose = true;
+    }
+
+
+
+    private static bool TryGetNextElement<T>(T[] array, int index, out T nextElement)
+    {
+        nextElement = default!;
+
+        if (index + 1 < array.Length)
+        {
+            nextElement = array[index + 1];
+            return true;
+        }
+
+        return false;
     }
 }

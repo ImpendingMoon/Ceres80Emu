@@ -1,6 +1,6 @@
 ﻿namespace Ceres80Emu.Emulator;
 
-internal struct DecodedInstruction
+public struct DecodedInstruction
 {
     public ushort Address;
     public int Size;

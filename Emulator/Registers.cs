@@ -4,7 +4,7 @@ namespace Ceres80Emu.Emulator;
 
 // Does not work on Big Endian devices.
 [StructLayout(LayoutKind.Explicit)]
-internal class Registers
+public class Registers
 {
     // Primary Registers
     [FieldOffset(0)] public ushort AF;

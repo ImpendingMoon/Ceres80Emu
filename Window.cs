@@ -3,7 +3,7 @@
 namespace Ceres80Emu;
 
 // This could be a singleton, but Raylib throws CLR errors when used inside Lazy<T>
-internal static class Window
+public static class Window
 {
     private static RenderTexture2D _targetTexture;
 
